@@ -21,7 +21,7 @@ void solve() {
 
     if (k == 1 && !is_sorted(a.begin(), a.end())) cout << "NO\n";
     else if (k == 1 && is_sorted(a.begin(), a.end())) cout << "YES\n";
-    else if (k == a.size()) cout << "YES\n";
+    else cout << "YES\n";
 
 
 }
