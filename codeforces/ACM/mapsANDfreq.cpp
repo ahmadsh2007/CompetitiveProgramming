@@ -27,14 +27,25 @@ int main(){
 
     // ! Code here:
     // Frequency Arrays
-    vector<int> freq(1000); // from 0 to 999
 
+    // vector<int> freq(1000); // from 0 to 999
+
+    // int n; cin >> n;
+    // for (int i = 0; i < n; i++){
+    //     int a; cin >> a;
+
+    //     freq[a]++;
+    // }
+
+    // for(auto &x : freq) cout << x << ' ';
+
+    // ! FREQUENCY ARRAY for Letters
     int n; cin >> n;
-    for (int i = 0; i < n; i++){
-        int a; cin >> a;
-
-        freq[a]++;
+    string x; cin >> x;
+    vector<int> freq(26);
+    for(int i = 0; i < n; i++){
+        freq[x[i] - 'a']++; // Let's say we entered 'a': a - a = 0, 'b': b - a = 1
     }
 
-    for(auto &x : freq) cout << x << ' ';
+    for(auto &x : freq) cout << x;
 }
