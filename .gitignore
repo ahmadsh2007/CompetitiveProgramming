@@ -5,3 +5,5 @@ output.txt
 cp_commit.py
 .cp_counter
 *.exe
+.vs
+.cph
