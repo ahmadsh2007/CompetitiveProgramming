@@ -31,26 +31,49 @@ void solve() {
         else if (islower(s[i]) && s[i] != 'b') small.push_front(i);
     }
 
-    string ans = "";
-    while (!small.empty() || !big.empty()) {
-        if (!small.empty() && !big.empty()) {
-            if (small.back() < big.back()) {
-                ans += s[small.back()];
-                small.pop_back();
-            } else {
-                ans += s[big.back()];
-                big.pop_back();
-            }
-        } else if (!small.empty()) {
-            ans += s[small.back()];
-            small.pop_back();
-        } else {
-            ans += s[big.back()];
-            big.pop_back();
-        }
+    // ! My old code
+    // string ans = "";
+    // while (!small.empty() || !big.empty()) {
+    //     if (!small.empty() && !big.empty()) {
+    //         if (small.back() < big.back()) {
+    //             ans += s[small.back()];
+    //             small.pop_back();
+    //         } else {
+    //             ans += s[big.back()];
+    //             big.pop_back();
+    //         }
+    //     } else if (!small.empty()) {
+    //         ans += s[small.back()];
+    //         small.pop_back();
+    //     } else {
+    //         ans += s[big.back()];
+    //         big.pop_back();
+    //     }
+    // }
+    //
+    // cout << ans << '\n';
+
+    // ! Yaseen's code
+    vector<int> IN(sz(s));
+
+    while (!big.empty())
+    {
+        IN[big.back()] = 1;
+        big.pop_back();
     }
 
-    cout << ans << '\n';
+    while (!small.empty())
+    {
+        IN[small.back()] = 1;
+        small.pop_back();
+    }
+
+    for (int i = 0; i < (int)s.size(); i++)
+        if (IN[i])
+            cout << s[i];
+        
+    
+    cout << endl;
 }
 
 int main() {
