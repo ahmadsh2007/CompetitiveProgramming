@@ -56,21 +56,18 @@ def main():
         print("🚫 Cancelled.")
         return
 
-    # Git operations
+    data["daily_commits"][today_str] = commits_today
+    save_data(data)
+
     subprocess.run("git add --all", shell=True)
     result = subprocess.run(f'git commit -m "{msg}"', shell=True)
 
     if result.returncode != 0:
-        print("❌ Commit failed. Counter not updated.")
+        print("❌ Commit failed.")
         return
 
     subprocess.run("git pull --rebase", shell=True)
-
     subprocess.run("git push", shell=True)
-
-    # Save updated state
-    data["daily_commits"][today_str] = commits_today
-    save_data(data)
 
     print("\n✅ Done!")
     print(f"📆 Day: {day_number}")
