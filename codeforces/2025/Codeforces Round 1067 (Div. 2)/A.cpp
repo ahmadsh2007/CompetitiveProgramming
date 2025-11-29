@@ -1,0 +1,42 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define all(x) (x).begin(), (x).end()
+#define rall(x) (x).rbegin(), (x).rend()
+#define sz(x) (int)(x).size()
+#define str string // What a Python
+
+using i64 = long long;
+using u64 = unsigned long long;
+using u32 = unsigned;
+
+using u128 = unsigned __int128;
+using i128 = __int128;
+
+static const int IO_SPEEDUP = [](){
+    ios::sync_with_stdio(false);
+    cout.tie(nullptr);
+    cin.tie(nullptr);
+    return 0;
+}();
+
+void solve() {
+    int n, y, r; cin >> n >> y >> r;
+    int sum = n - (r + y / 2);
+    if (sum <= 0) cout << n << '\n';
+    else cout << (r + y / 2) << '\n';
+}
+
+int main() {
+    #ifndef ONLINE_JUDGE
+      freopen("input.txt", "r", stdin);
+      freopen("output.txt", "w", stdout);
+    #endif
+
+    // print("Ahmad"); // Yes, it works and yes, it's Python
+
+    int T = 1;
+    cin >> T;
+    while (T--) solve();
+    return 0;
+}
