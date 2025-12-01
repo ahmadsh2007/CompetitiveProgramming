@@ -26,9 +26,23 @@ static const int IO_SPEEDUP = [](){
 
 void solve() {
     int n; cin >> n;
+    priority_queue<int, vector<int>, greater<int>> pq;
+    
     int sum = 0;
-    vector<int> a(n);
-    for (auto &x : a) cin >> x;
+
+    for(int i = 0; i < n; i++) {
+        int x; cin >> x;
+
+        pq.push(x);
+        sum += x;
+
+        if (sum < 0) {
+            sum -= pq.top();
+            pq.pop();
+        }
+    }
+
+    cout << pq.size();
 }
 
 #undef int
