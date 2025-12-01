@@ -4,6 +4,18 @@ using namespace std;
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
 #define sz(x) (int)(x).size()
+#define endl '\n'
+#define int long long
+#define str string // What a Python
+
+using i64 = long long;
+using ll = long long;
+using u64 = unsigned long long;
+using ull = unsigned long long;
+using u32 = unsigned;
+
+using u128 = unsigned __int128;
+using i128 = __int128;
 
 static const int IO_SPEEDUP = [](){
     ios::sync_with_stdio(false);
@@ -12,29 +24,39 @@ static const int IO_SPEEDUP = [](){
     return 0;
 }();
 
-
 void solve() {
-    int n, x; cin >> n >> x;
+    int n; cin >> n;
+    bool dot = false;
+    int sum = 0;
 
-    int ans = 0, mx = -1;
-    vector<int> a(n);
-    cin >> a[0];
-    for (int i = 1; i < n; i++){
+    vector<char> a(n);
+    for (int i = 0; i < n; i++){
         cin >> a[i];
-        mx = max(mx, a[i] - a[i - 1]);
+        if (a[i] == '.') { 
+            dot = true;
+            sum++;
+        }
     }
 
-    ans = max(((x - a[n - 1]) * 2), max(mx, a[0] - 0));
-    cout << ans << '\n';
+    if (!dot) { cout << 0 << endl; return; }
+    
+    for (int i = 2; i < n; i++) {
+        if (a[i] == '.' && a[i - 1] == a[i] && a[i - 2] == a[i]) { cout << 2 << '\n'; return; }
+    }
+
+    cout << sum << '\n';
 }
 
+#undef int
 int main() {
     #ifndef ONLINE_JUDGE
       freopen("input.txt", "r", stdin);
       freopen("output.txt", "w", stdout);
     #endif
 
-    int T = 1;
+    // print("Ahmad"); // Yes, it works and yes, it's Python
+
+    ull T = 1;
     cin >> T;
     while (T--) solve();
     return 0;
