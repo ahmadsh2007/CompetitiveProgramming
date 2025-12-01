@@ -72,4 +72,30 @@ int main(){
 
     cout << dq.front() << '\n';
     cout << dq.back() << '\n';
+
+
+    // ! Priority Queues
+    priority_queue<int, vector<int>, greater<int>> pq;
+    pq.push(9);
+    pq.push(8);
+    pq.push(6);
+
+    auto temp = pq;
+    while (!temp.empty())
+    {
+        cout << temp.top() << " ";
+        temp.pop();
+    }
+    return 0;
+    // * Output: 6 8 9 
+
+    // ! Time Complexity
+    // The below table lists the time complexity of the above operations on priority queue:
+
+    // * Operation	                                            Time Complexity
+    // * Add element	                                            O(log n)
+    // * Delete element	                                        O(log n)
+    // * Find maximum element in max heap.	                    O(1)
+    // * Find minimum element in min heap.                       O(1)
+    // * Initialize priority queue from another container.           O(n)
 }
