@@ -92,10 +92,33 @@ int main(){
     // ! Time Complexity
     // The below table lists the time complexity of the above operations on priority queue:
 
-    // * Operation	                                            Time Complexity
+    // ? Operation	                                                Time Complexity
     // * Add element	                                            O(log n)
-    // * Delete element	                                        O(log n)
-    // * Find maximum element in max heap.	                    O(1)
-    // * Find minimum element in min heap.                       O(1)
-    // * Initialize priority queue from another container.           O(n)
+    // * Delete element	                                            O(log n)
+    // * Find maximum element in max heap.	                        O(1)
+    // * Find minimum element in min heap.                          O(1)
+    // * Initialize priority queue from another container.          O(n)
+
+
+    // ! Priority Queue vs Queue
+
+    // ? Feature                Queue                                   Priority Queue
+    // * Order of Removal       FIFO (First-In, First-Out)              Based on priority
+    // * Element Priority       All elements treated equally.           Each element has a priority.
+    // * Use case               Task scheduling, print queue            CPU scheduling, Dijkstra's Algorithm
+    // * Default Behavior       Inserts at rear, removes front          Inserts anywhere, removes highest priority
+    // * STL Class in C++       queue                                   priority_queue
+
+    // ! All Member Functions
+    // Following is the list of all member functions of std::priority_queue class in C++:
+
+    // ? Function       Definition
+    // * empty()        Returns whether the priority queue is empty.
+    // * size()         Returns the size of the priority queue.
+    // * top()          Returns top element of the priority queue.
+    // * push()         Adds the element into the priority queue.
+    // * pop()          Deletes the top element of the priority queue.
+    // * swap()         Used to swap the contents of two priority queues provided the
+    // *                queues must be of the same type, although sizes may differ.
+    // * emplace()      Used to insert a new element into the priority queue container.
 }
