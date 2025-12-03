@@ -6,6 +6,13 @@ from datetime import datetime
 
 COUNTER_FILE = ".cp_counter"
 
+# ANSI Colors
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+CYAN = "\033[36m"
+RESET = "\033[0m"
+
 def load_data():
     if not os.path.exists(COUNTER_FILE):
         return {
@@ -27,6 +34,15 @@ def main():
 
     data = load_data()
 
+    # -------------------------------------------
+    # 🔍 Check if repo has changes
+    # -------------------------------------------
+    changes = subprocess.run("git diff --quiet && git diff --cached --quiet", shell=True)
+    if changes.returncode == 0:
+        print(f"{YELLOW}⚠️  No changes detected — commit skipped.{RESET}")
+        return
+    # -------------------------------------------
+
     start_date = datetime.strptime(data["start_date"], "%Y-%m-%d").date()
     today = datetime.today().date()
 
@@ -45,17 +61,18 @@ def main():
     # Commit logic per work day
     commits_today = data["daily_commits"].get(today_str, 0) + 1
 
-    # Format
+    # Format commit message
     msg = f"Day {day_number:03d} Work Day {work_day_number:03d} Commit {commits_today:02d}"
 
-    print("\n📌 Commit preview:")
+    print(f"\n{CYAN}📌 Commit preview:{RESET}")
     print(f"   \"{msg}\"\n")
 
     confirm = input("Proceed with commit? (y/n): ").lower()
     if confirm != 'y':
-        print("🚫 Cancelled.")
+        print(f"{RED}🚫 Cancelled.{RESET}")
         return
 
+    # Save updated commit count
     data["daily_commits"][today_str] = commits_today
     save_data(data)
 
@@ -63,16 +80,19 @@ def main():
     result = subprocess.run(f'git commit -m "{msg}"', shell=True)
 
     if result.returncode != 0:
-        print("❌ Commit failed.")
+        print(f"{RED}❌ Commit failed.{RESET}")
         return
 
+    print(f"{CYAN}🔄 Pulling latest changes...{RESET}")
     subprocess.run("git pull --rebase", shell=True)
+
+    print(f"{GREEN}⬆️  Pushing to remote...{RESET}")
     subprocess.run("git push", shell=True)
 
-    print("\n✅ Done!")
+    print(f"\n{GREEN}✅ Done!{RESET}")
     print(f"📆 Day: {day_number}")
     print(f"💼 Work Day: {work_day_number}")
-    print(f"📊 Commits today: {commits_today}")
+    print(f"📊 Commits today: {commits_today}\n")
 
 if __name__ == "__main__":
     main()
