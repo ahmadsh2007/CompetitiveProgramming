@@ -35,10 +35,13 @@ def main():
     data = load_data()
 
     # -------------------------------------------
-    # 🔍 Check if repo has changes
+    # 🔍 Check if repo has changes (staged, unstaged, OR untracked)
     # -------------------------------------------
-    changes = subprocess.run("git diff --quiet && git diff --cached --quiet", shell=True)
-    if changes.returncode == 0:
+    # We use 'git status --porcelain' to check for any files with a non-empty status (M, A, D, ??, etc.)
+    status_check = subprocess.run("git status --porcelain", shell=True, capture_output=True, text=True)
+    
+    # If the output is empty, there are no changes, staged, or untracked files
+    if not status_check.stdout.strip():
         print(f"{YELLOW}⚠️  No changes detected — commit skipped.{RESET}")
         return
     # -------------------------------------------
