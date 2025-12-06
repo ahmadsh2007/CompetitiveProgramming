@@ -24,26 +24,26 @@ static const int IO_SPEEDUP = [](){
     return 0;
 }();
 
+void queries(int totSum, const vector<int> &pre){
+    int l, r, k; cin >> l >> r >> k;
+
+    int curSum = pre[r] - pre[l - 1];
+    int len = r - l + 1;
+    int newSum = totSum - curSum + k * len;
+
+    if (newSum % 2 == 1) cout << "YES\n";
+    else cout << "NO\n";
+
+}
+
 void solve() {
-    int n, k; cin >> n >> k;
-    
+    int n, q; cin >> n >> q;
     vector<int> a(n);
-    for (auto &x : a) cin >> x;
-    vector<int> t(n);
-    for (auto &x : t) cin >> x;
-
-    int sum = 0;
-    for(int i = 0; i < n; i++)
-        if (t[i]) sum += a[i];
-    
     vector<int> pre(n + 1);
-    for(int i = 1; i < k + 1; i++) pre[i] = pre[i - 1] + (!t[i - 1] ? a[i - 1] : 0);
-    for(int i = k + 1; i <= n; i++) pre[i] = pre[i - 1] + (!t[i - 1] ? a[i - 1] : 0) - (!t[i - k - 1] ? a[i - k - 1] : 0);
+    for(auto &x : a) cin >> x;
+    for(int i = 1; i <= n; i++) pre[i] = pre[i - 1] + a[i - 1];
 
-    int ans = -1;
-    for (int i = 1; i <= n; i++) ans = max(ans, pre[i]);
-
-    cout << sum + ans << '\n';
+    while(q--) queries(pre[n], pre);
 }
 
 #undef int
@@ -56,7 +56,7 @@ int main() {
     // print("Ahmad"); // Yes, it works and yes, it's Python
 
     ull T = 1;
-    // cin >> T;
+    cin >> T;
     while (T--) solve();
     return 0;
 }

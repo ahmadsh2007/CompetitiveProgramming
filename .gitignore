@@ -6,4 +6,3 @@ output.txt
 .cph
 .vscode/
 .vscode
-*[^.]*
