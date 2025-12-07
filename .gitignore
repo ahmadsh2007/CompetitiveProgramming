@@ -7,3 +7,4 @@ output.txt
 .vscode/
 .vscode
 bin/
+.DS_Store
