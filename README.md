@@ -89,11 +89,22 @@ int main() {
 
 * `settings.json` ensures all C++ executables are created in `bin/` and includes the `Utils` folder for headers:
 
+**macOS / Linux**
+
 ```json
 "code-runner.executorMap": {
   "cpp": "cd $dir && mkdir -p bin && g++ $fileName -I$workspaceRoot/Utils -o bin/$fileNameWithoutExt && bin/$fileNameWithoutExt"
 }
 ```
+
+**Windows (PowerShell)**
+
+```json
+"code-runner.executorMap": {
+  "cpp": "cd $dir; if (!(Test-Path bin)) { New-Item -ItemType Directory -Path bin | Out-Null }; g++ $fileName -I$workspaceRoot/Utils -o bin/$fileNameWithoutExt; ./bin/$fileNameWithoutExt"
+}
+```
+
 
 * ONLINE_JUDGE mode reads from `Utils/input.txt` and writes to `Utils/output.txt`.
 
