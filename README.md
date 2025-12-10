@@ -1,10 +1,16 @@
+![Codeforces Badge](https://img.shields.io/badge/Codeforces-ahmadsh2007-red?style=flat-square)
+![CF Rating](https://img.shields.io/badge/dynamic/json?style=flat-square&color=blue&label=CF%20Rating&query=%24.result[0].rating&url=https://codeforces.com/api/user.info?handles=ahmadsh2007)
+![GitHub last commit](https://img.shields.io/github/last-commit/ahmadsh2007/CompetitiveProgramming?style=flat-square)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ahmadsh2007/CompetitiveProgramming?style=flat-square)
+![GitHub repo size](https://img.shields.io/github/repo-size/ahmadsh2007/CompetitiveProgramming?style=flat-square)
+![C++](https://img.shields.io/badge/C++-17/20/23-blue?style=flat-square&logo=c%2B%2B)
+![License](https://img.shields.io/github/license/ahmadsh2007/CompetitiveProgramming?style=flat-square)
+
 # Competitive Programming Repository
 
 Welcome to my Competitive Programming (CP) repository! This repository is structured to help me efficiently solve problems and practice algorithms across multiple platforms and contests.
 
 ## Codeforces Stats
-
-![Codeforces Badge](https://img.shields.io/badge/Codeforces-ahmadsh2007-blue?style=flat-square)
 
 ![Codeforces Stats](https://codeforces-readme-stats.vercel.app/api/card?username=ahmadsh2007&theme=default)
 
