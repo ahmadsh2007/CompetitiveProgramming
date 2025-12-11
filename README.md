@@ -10,7 +10,7 @@
 
 Welcome to my Competitive Programming (CP) repository! This repository is structured to help me efficiently solve problems and practice algorithms across multiple platforms and contests.
 
-## Codeforces Stats
+## CodeForces Stats
 
 ![Codeforces Stats](https://codeforces-readme-stats.vercel.app/api/card?username=ahmadsh2007&theme=default)
 
