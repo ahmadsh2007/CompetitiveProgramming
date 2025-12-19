@@ -37,10 +37,13 @@ def main():
     # -------------------------------------------
     # 🔍 Check if repo has changes (staged, unstaged, OR untracked)
     # -------------------------------------------
-    # We use 'git status --porcelain' to check for any files with a non-empty status (M, A, D, ??, etc.)
-    status_check = subprocess.run("git status --porcelain", shell=True, capture_output=True, text=True)
-    
-    # If the output is empty, there are no changes, staged, or untracked files
+    status_check = subprocess.run(
+        "git status --porcelain",
+        shell=True,
+        capture_output=True,
+        text=True
+    )
+
     if not status_check.stdout.strip():
         print(f"{YELLOW}⚠️  No changes detected — commit skipped.{RESET}")
         return
@@ -51,7 +54,6 @@ def main():
 
     # Count total days since starting
     day_number = (today - start_date).days + 1
-
     today_str = today.strftime("%Y-%m-%d")
 
     # Work day logic
@@ -64,23 +66,29 @@ def main():
     # Commit logic per work day
     commits_today = data["daily_commits"].get(today_str, 0) + 1
 
-    # Format commit message
     msg = f"Day {day_number:03d} Work Day {work_day_number:03d} Commit {commits_today:02d}"
 
     print(f"\n{CYAN}📌 Commit preview:{RESET}")
     print(f"   \"{msg}\"\n")
 
-    confirm = input("Proceed with commit? (y/n): ").lower()
-    if confirm != 'y':
-        print(f"{RED}🚫 Cancelled.{RESET}")
-        return
+    confirm = input("Press [e] to edit, or Enter to commit: ").strip().lower()
 
-    # Save updated commit count
     data["daily_commits"][today_str] = commits_today
     save_data(data)
 
     subprocess.run("git add --all", shell=True)
-    result = subprocess.run(f'git commit -m "{msg}"', shell=True)
+
+    # Commit
+    if confirm == 'e':
+        result = subprocess.run(
+            f'git commit -e -m "{msg}"',
+            shell=True
+        )
+    else:
+        result = subprocess.run(
+            f'git commit -m "{msg}"',
+            shell=True
+        )
 
     if result.returncode != 0:
         print(f"{RED}❌ Commit failed.{RESET}")
