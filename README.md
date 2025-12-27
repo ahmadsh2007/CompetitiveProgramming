@@ -1,10 +1,10 @@
-![Codeforces Badge](https://img.shields.io/badge/Codeforces-ahmadsh2007-red?style=flat-square)
-![CF Rating](https://img.shields.io/badge/dynamic/json?style=flat-square&color=blue&label=CF%20Rating&query=%24.result[0].rating&url=https://codeforces.com/api/user.info?handles=ahmadsh2007)
-![GitHub last commit](https://img.shields.io/github/last-commit/ahmadsh2007/CompetitiveProgramming?style=flat-square)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ahmadsh2007/CompetitiveProgramming?style=flat-square)
-![GitHub repo size](https://img.shields.io/github/repo-size/ahmadsh2007/CompetitiveProgramming?style=flat-square)
+![Codeforces Badge](https://img.shields.io/badge/Codeforces-leeking-red?style=flat-square)
+![CF Rating](https://img.shields.io/badge/dynamic/json?style=flat-square&color=blue&label=CF%20Rating&query=%24.result[0].rating&url=https://codeforces.com/api/user.info?handles=leeking)
+![GitHub last commit](https://img.shields.io/github/last-commit/leeking/CompetitiveProgramming?style=flat-square)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/leeking/CompetitiveProgramming?style=flat-square)
+![GitHub repo size](https://img.shields.io/github/repo-size/leeking/CompetitiveProgramming?style=flat-square)
 ![C++](https://img.shields.io/badge/C++-17/20/23-blue?style=flat-square&logo=c%2B%2B)
-![License](https://img.shields.io/github/license/ahmadsh2007/CompetitiveProgramming?style=flat-square)
+![License](https://img.shields.io/github/license/leeking/CompetitiveProgramming?style=flat-square)
 
 # Competitive Programming Repository
 
@@ -12,7 +12,7 @@ Welcome to my Competitive Programming (CP) repository! This repository is struct
 
 ## CodeForces Stats
 
-![Codeforces Stats](https://codeforces-readme-stats.vercel.app/api/card?username=ahmadsh2007&theme=default)
+![Codeforces Stats](https://codeforces-readme-stats.vercel.app/api/card?username=leeking&theme=default)
 
 ## Repository Structure
 
