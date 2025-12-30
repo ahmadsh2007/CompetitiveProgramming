@@ -57,3 +57,32 @@ int main() {
     while (T--) solve();
     return 0;
 }
+
+
+
+/*
+
+
+
+#include <iostream>
+using namespace std;
+
+int main() {
+    int arr[] = {1, 2, 3, 4, 5};
+    int n = 5;
+    int suffix[n];
+
+    suffix[n - 1] = arr[n - 1];
+
+    for (int i = n - 2; i >= 0; i--) {
+        suffix[i] = arr[i] + suffix[i + 1];
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << suffix[i] << " ";
+    }
+}
+
+
+
+*/
