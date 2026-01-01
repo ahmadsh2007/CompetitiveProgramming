@@ -63,4 +63,13 @@ int main(){
     for (auto &x : v3) cout << x.first << ' ' << x.second << '\n';
 
     sort(v3.begin(), v3.end());
+
+
+    // ! Sort by second value
+    vector<pair<int, int>> a;
+    sort(a.begin(), a.end(), [](const pair<int,int>& p1,
+                                const pair<int,int>& p2) {
+        return p1.second < p2.second;
+    });
+
 }
