@@ -72,4 +72,15 @@ int main(){
         return p1.second < p2.second;
     });
 
+    // * If you want descending order by second
+    sort(a.begin(), a.end(), [](const auto& p1, const auto& p2) {
+        return p1.second > p2.second;
+    });
+ 
+    // * If you want tie-breaking (second, then first)
+    sort(a.begin(), a.end(), [](const auto& p1, const auto& p2) {
+        if (p1.second != p2.second)
+            return p1.second < p2.second;
+        return p1.first < p2.first;
+    });
 }
