@@ -25,4 +25,20 @@ int main(){
     name.insert(position, str);
 
     name.replace(position, length, str);
+
+    isupper(name[0]);
+    islower(name[0]);
+
+    toupper(name[0]);
+    tolower(name[0]);
+
+    string line;
+    getline(cin, line);
+
+    string a = "Ahmad";
+    string b = "Hamza";
+    a.swap(b);
+
+    sort(a.begin(), a.end());
+    reverse(a.begin(), a.end());
 }
