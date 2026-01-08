@@ -47,7 +47,7 @@ void solve() {
 
     int x; cin >> x;
     for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < m; j++)
             if (a[i][j] == x) { cout << "YES" << endl; return; }
 
     cout << "NO" << endl;
