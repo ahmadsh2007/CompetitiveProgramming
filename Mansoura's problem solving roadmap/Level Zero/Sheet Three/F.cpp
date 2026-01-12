@@ -38,20 +38,39 @@ static const int IO_SPEEDUP = [](){
     return 0;
 }();
 
+struct ThreeD {
+    int x;
+    int y;
+    int z;
+};
+
+struct frequency {
+    map<int, int> x;
+    map<int, int> y;
+    map<int, int> z;
+};
+
 void solve() {
     int n; cin >> n;
-    int x[n], y[n], z[n];
-    map<int, int> freqX, freqY, freqZ;
+    // int x[n], y[n], z[n];
+    // map<int, int> freqX, freqY, freqZ;
+    // for (int i = 0; i < n; i++) {
+    //     cin >> x[i] >> y[i] >> z[i];
+    //     freqX[x[i]]++, freqY[y[i]]++, freqZ[z[i]]++;
+    // }
+    // for (int i = 0; i < n; i++) {
+    //     cout << freqX[x[i]] - 1 << ' ' << freqY[y[i]] - 1 << ' ' << freqZ[z[i]] - 1 << endl; 
+    // }
 
-
+    ThreeD stars[n];
+    frequency freq;
     for (int i = 0; i < n; i++) {
-        cin >> x[i] >> y[i] >> z[i];
-        freqX[x[i]]++, freqY[y[i]]++, freqZ[z[i]]++;
+        cin >> stars[i].x >> stars[i].y >> stars[i].z;
+        freq.x[stars[i].x]++, freq.y[stars[i].y]++, freq.z[stars[i].z]++;
     }
 
-    for (int i = 0; i < n; i++) {
-        cout << freqX[x[i]] - 1 << ' ' << freqY[y[i]] - 1 << ' ' << freqZ[z[i]] - 1 << endl; 
-    }
+    for (int i = 0; i < n; i++)
+        cout << freq.x[stars[i].x] - 1 << ' ' << freq.y[stars[i].y] - 1<< ' ' << freq.z[stars[i].z] - 1 << '\n';
 }
 
 #undef int
