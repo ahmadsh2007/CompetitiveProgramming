@@ -7,3 +7,4 @@ output.txt
 .vscode
 bin/
 .DS_Store
+DDebug.dSYM/
