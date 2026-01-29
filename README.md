@@ -54,11 +54,13 @@ using namespace std;
 #define int long long
 #define str string // What a Python
 
-using i64 = long long;
-using ll = long long;
-using u64 = unsigned long long;
+#define vi   vector<int>
+#define vill vector<ll>
+#define cin(v)  for (auto &x : v) cin >> x;
+#define cout(v) for (auto &x : v) cout << x << ' ';
+
+using ll  = long long;
 using ull = unsigned long long;
-using u32 = unsigned;
 
 using u128 = unsigned __int128;
 using i128 = __int128;
@@ -74,7 +76,7 @@ void solve() {
     // Your solution here
 }
 
-#undef int
+const bool TESTCASES = 1;
 int main() {
     #ifndef ONLINE_JUDGE
         // ! adjust depth if necessary
@@ -84,9 +86,9 @@ int main() {
 
     // print("Leeking"); // Yes, it works and yes, it's Python
 
-    ull T = 1;
-    // cin >> T;
-    while (T--) solve();
+    ull TTT = 1;
+    if (TESTCASES) cin >> TTT;
+    while (TTT--) solve();
     return 0;
 }
 ```
