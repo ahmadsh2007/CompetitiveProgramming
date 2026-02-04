@@ -76,4 +76,19 @@ int main()
     // Step 4: Calculate the Answer,
     //         Answer = pre[Down][Right]   - pre[Down][Left - 1]
     //                - pre[Up - 1][Right] + pre[Up - 1][Left - 1]
+
+
+    // ! Let's say we have an array 4x4, and we want to add 1 to [1][1], [1][2], [2][1], [2][2] without brute forcing
+    // * Let's draw the array first
+    //  |   |   |   |   |
+    //  |   |   |   |   |
+    //  |   |   |   |   |
+    //  |   |   |   |   |
+
+    // This is the array starting from [0][0] and ending on [3][3]
+    // to add the one without brute forcing we should add one to [1][1] and [3][3] and remove one from [3][1] and [1][3]
+    //  |   |    |   |    |
+    //  |   | 1  |   | -1 |
+    //  |   |    |   |    |
+    //  |   | -1 |   | 1  |
 }
