@@ -81,4 +81,25 @@ signed main() {
     factorized.clear();
     factorized = primeFactorizationBetterApproach(n);
     printVector(factorized);
+
+    // The same as Better Approach but in people's way
+    auto primeFactorizationPeopleApproach = [](ll n) -> vector<ll> {
+        vector<ll> primes;
+        for (int i = 2; i * i <= n; i++) {
+            while (n % i == 0) {
+                primes.push_back(i);
+                n /= i;
+            }
+        }
+
+        if (n != 1) {
+            primes.push_back(n);
+            n = 1;
+        }
+        return primes;
+    };
+
+    factorized.clear();
+    factorized = primeFactorizationBetterApproach(n);
+    printVector(factorized);
 }
