@@ -66,8 +66,8 @@ static const int IO_SPEEDUP = [](){
 }();
 
 const int N = 1500000;
-vector<bool> primes(N, 1);
-vector<int> divide(N);
+vector<bool> primes(N + 1, 1);
+vector<int> divide(N + 1);
 
 vi primeFactorization(int n) {
     vi ret;
