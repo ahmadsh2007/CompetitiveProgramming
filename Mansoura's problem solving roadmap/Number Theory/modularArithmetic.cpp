@@ -37,4 +37,7 @@ signed main(){
     // ans += x % y
     // ans %= y
     // ```
+
+    // (a - b) % n = (a % n - b % n + n) % n
+    // (a * b) % n = (a % n * b % n) % n
 }
