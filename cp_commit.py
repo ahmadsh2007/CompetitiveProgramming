@@ -48,6 +48,24 @@ def save_data(data):
         json.dump(data, f)
 
 
+def read_counter_raw():
+    if not os.path.exists(COUNTER_FILE):
+        return None
+    with open(COUNTER_FILE, "r") as f:
+        return f.read()
+
+
+def restore_counter_raw(raw: str | None):
+    if raw is None:
+        try:
+            os.remove(COUNTER_FILE)
+        except OSError:
+            pass
+    else:
+        with open(COUNTER_FILE, "w") as f:
+            f.write(raw)
+
+
 def get_changed_files():
     res = run("git status --porcelain", capture=True)
     lines = [ln for ln in (res.stdout or "").splitlines() if ln.strip()]
@@ -80,7 +98,6 @@ def pull_if_needed():
         print(f"{YELLOW}⚠️  No upstream set (branch not tracking remote). Skipping pull.{RESET}")
         return
 
-    # fast check first
     run("git fetch --quiet")
     b = behind_count()
     if b > 0:
@@ -112,10 +129,6 @@ def compute_commit_fields(data):
 
 
 def edit_commit_message(default_msg: str) -> str:
-    """
-    Opens your editor once and returns the edited message.
-    Uses $GIT_EDITOR, then $EDITOR, else vi.
-    """
     editor = os.environ.get("GIT_EDITOR") or os.environ.get("EDITOR") or "vi"
 
     with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=".msg") as tf:
@@ -138,10 +151,11 @@ def edit_commit_message(default_msg: str) -> str:
 
 def stage_menu_and_maybe_edit_msg(msg_ref: dict):
     """
-    Single place for:
-      - choose staging mode [Enter]/p/f
-      - OR press e to edit commit message
-    So you never have to press e twice across multiple prompts.
+    One place only:
+      Enter = stage all
+      p = patch
+      f = select files (supports 1-5,7)
+      e = edit commit message
     """
     files = get_changed_files()
     if not files:
@@ -149,11 +163,16 @@ def stage_menu_and_maybe_edit_msg(msg_ref: dict):
         sys.exit(0)
 
     while True:
+        files = get_changed_files()
+        if not files:
+            print(f"{YELLOW}⚠️  No changes detected — commit skipped.{RESET}")
+            sys.exit(0)
+
         print(f"{CYAN}🧾 Changes detected:{RESET}")
         for i, f in enumerate(files, 1):
             print(f"  {i:>2}. {f}")
 
-        print("\nOptions (one prompt only):")
+        print("\nOptions:")
         print("  [Enter] Stage ALL changes and continue")
         print("  [p]     Patch mode (pick hunks)  -> git add -p")
         print("  [f]     Choose files to stage (e.g. 1,3,4 or 1-5,7)")
@@ -221,6 +240,9 @@ def stage_menu_and_maybe_edit_msg(msg_ref: dict):
 
         print(f"{YELLOW}⚠️  Unknown choice '{choice}'. Try again.{RESET}\n")
 
+    # IMPORTANT: Always include counter file in the commit (old behavior)
+    run(f"git add -- {shlex.quote(COUNTER_FILE)}")
+
     staged = run("git diff --cached --name-only", capture=True)
     if not (staged.stdout or "").strip():
         print(f"{YELLOW}⚠️  Nothing staged. Commit skipped.{RESET}")
@@ -241,7 +263,7 @@ def main():
 
     ensure_git_repo()
 
-    # Always do fetch->pull-if-behind first (your requested behavior)
+    # 1) Always: fetch -> pull if behind
     pull_if_needed()
 
     # If no local changes, exit
@@ -256,23 +278,53 @@ def main():
     print(f"\n{CYAN}📌 Commit preview:{RESET}")
     print(f'   "{msg_ref["msg"]}"\n')
 
-    if args.y:
-        # Auto mode: no prompts
-        res = run("git add --all")
-        if res.returncode != 0:
-            print(f"{RED}❌ Staging failed.{RESET}")
+    # --- Update cp_counter BEFORE staging (so it is committed) ---
+    # But keep a backup so if commit fails, we revert it.
+    counter_backup = read_counter_raw()
+
+    data["daily_commits"][today_str] = commits_today_next
+    save_data(data)
+
+    try:
+        if args.y:
+            # Auto mode: no prompts
+            res = run("git add --all")
+            if res.returncode != 0:
+                print(f"{RED}❌ Staging failed.{RESET}")
+                restore_counter_raw(counter_backup)
+                return
+
+            safe_msg = msg_ref["msg"].replace('"', '\\"')
+            result = run(f'git commit -m "{safe_msg}"')
+            if result.returncode != 0:
+                print(f"{RED}❌ Commit failed.{RESET}")
+                # revert counter and unstage it to keep repo clean
+                restore_counter_raw(counter_backup)
+                run(f"git restore --staged -- {shlex.quote(COUNTER_FILE)}")
+                return
+
+            print(f"{GREEN}⬆️  Pushing to remote...{RESET}")
+            push = run("git push")
+            if push.returncode != 0:
+                print(f"{RED}❌ Push failed.{RESET}")
+                return
+
+            print(f"\n{GREEN}✅ Done!{RESET}")
+            print(f"📆 Day: {day_number}")
+            print(f"💼 Work Day: {work_day_number}")
+            print(f"📊 Commits today: {commits_today_next}\n")
             return
 
-        # escape quotes just in case
+        # Interactive mode: ONE prompt handles staging + edit message
+        stage_menu_and_maybe_edit_msg(msg_ref)
+
         safe_msg = msg_ref["msg"].replace('"', '\\"')
         result = run(f'git commit -m "{safe_msg}"')
         if result.returncode != 0:
             print(f"{RED}❌ Commit failed.{RESET}")
+            restore_counter_raw(counter_backup)
+            run(f"git restore --staged -- {shlex.quote(COUNTER_FILE)}")
             return
-
-        # save counters only after successful commit
-        data["daily_commits"][today_str] = commits_today_next
-        save_data(data)
 
         print(f"{GREEN}⬆️  Pushing to remote...{RESET}")
         push = run("git push")
@@ -284,31 +336,12 @@ def main():
         print(f"📆 Day: {day_number}")
         print(f"💼 Work Day: {work_day_number}")
         print(f"📊 Commits today: {commits_today_next}\n")
-        return
 
-    # Interactive mode: ONE prompt handles staging + edit message
-    stage_menu_and_maybe_edit_msg(msg_ref)
+    except Exception:
+        # Safety: if anything unexpected happens, restore counter
+        restore_counter_raw(counter_backup)
+        raise
 
-    safe_msg = msg_ref["msg"].replace('"', '\\"')
-    result = run(f'git commit -m "{safe_msg}"')
-    if result.returncode != 0:
-        print(f"{RED}❌ Commit failed.{RESET}")
-        return
-
-    # save counters only after successful commit
-    data["daily_commits"][today_str] = commits_today_next
-    save_data(data)
-
-    print(f"{GREEN}⬆️  Pushing to remote...{RESET}")
-    push = run("git push")
-    if push.returncode != 0:
-        print(f"{RED}❌ Push failed.{RESET}")
-        return
-
-    print(f"\n{GREEN}✅ Done!{RESET}")
-    print(f"📆 Day: {day_number}")
-    print(f"💼 Work Day: {work_day_number}")
-    print(f"📊 Commits today: {commits_today_next}\n")
 
 if __name__ == "__main__":
     main()
