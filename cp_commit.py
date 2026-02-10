@@ -62,23 +62,30 @@ def main():
     print(f"\n{CYAN}📌 Commit preview:{RESET}")
     print(f"   \"{msg}\"\n")
 
-    confirm = input("Press [e] to edit, or Enter to commit: ").strip().lower()
+    confirm = input(
+        "Press [e] to edit, [f] to choose files, [ef/fe] for both, or Enter to commit all: "
+    ).strip().lower()
 
     data["daily_commits"][today_str] = commits_today
     save_data(data)
 
-    subprocess.run("git add --all", shell=True)
+    use_edit = 'e' in confirm
+    use_files = 'f' in confirm
 
-    if confirm == 'e':
-        result = subprocess.run(
-            f'git commit -e -m "{msg}"',
-            shell=True
-        )
+    if use_files:
+        subprocess.run("git add -p", shell=True)
     else:
-        result = subprocess.run(
-            f'git commit -m "{msg}"',
-            shell=True
-        )
+        subprocess.run("git add --all", shell=True)
+
+    staged_check = subprocess.run("git diff --cached --quiet", shell=True)
+    if staged_check.returncode == 0:
+        print(f"{YELLOW}⚠️  No files staged — commit aborted.{RESET}")
+        return
+
+    if use_edit:
+        result = subprocess.run(f'git commit -e -m "{msg}"', shell=True)
+    else:
+        result = subprocess.run(f'git commit -m "{msg}"', shell=True)
 
     if result.returncode != 0:
         print(f"{RED}❌ Commit failed.{RESET}")
