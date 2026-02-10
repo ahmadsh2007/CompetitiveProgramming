@@ -129,14 +129,21 @@ def compute_commit_fields(data):
 
 
 def edit_commit_message(default_msg: str) -> str:
-    editor = os.environ.get("GIT_EDITOR") or os.environ.get("EDITOR") or "vi"
+    # Determine editor safely (Windows vs Unix)
+    editor = os.environ.get("GIT_EDITOR") or os.environ.get("EDITOR")
+
+    if not editor:
+        if os.name == "nt":          # Windows
+            editor = "notepad"
+        else:                        # Linux / macOS
+            editor = "vi"
 
     with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=".msg") as tf:
         tf.write(default_msg + "\n")
         tf.flush()
         path = tf.name
 
-    run(f"{editor} {shlex.quote(path)}")
+    run(f'{editor} "{path}"')
 
     with open(path, "r") as f:
         new_msg = f.read().strip()
@@ -344,4 +351,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # * Hello, World!
     main()
