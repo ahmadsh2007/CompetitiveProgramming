@@ -44,16 +44,39 @@ static const int IO_SPEEDUP = [](){
 }();
 
 void solve() {
-    int n = 50;
-    int ans = 0;
+    int n, k; cin >> n >> k;
 
+    auto divisors = [](int n) -> vi {
+        vi ret;
+        for (int i = 1; i * i <= n; i++) {
+            if (n % i == 0) {
+                ret.push_back(i);
+                if (i * i != n) ret.push_back(n / i);
+            }
+        }
 
+        return ret;
+    };
 
-    cout << sqrt(n) << endl;
+    vi ans = divisors(n);
+    sort(all(ans));
+
+    if (ans.size() >= k) cout << ans[k - 1] << endl;
+    else cout << "-1\n";
 }
 
-const int TESTCASES = 0;
+const int TESTCASES = 2;
 signed main() {
+    #ifndef ONLINE_JUDGE
+    #if __has_include("../../Utils/debug.h")
+      freopen("../../Utils/input.txt", "r", stdin);
+      freopen("../../Utils/output.txt", "w", stdout);
+    #else
+      freopen("../../../Utils/input.txt", "r", stdin);
+      freopen("../../../Utils/output.txt", "w", stdout);
+    #endif
+    #endif
+
     // print("Leeking"); // Yes, it works and yes, it's Python
 
     ull TTT = 1;
