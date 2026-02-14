@@ -8,3 +8,4 @@ output.txt
 bin/
 .DS_Store
 DDebug.dSYM/
+Temp/
