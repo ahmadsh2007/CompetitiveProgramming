@@ -47,40 +47,54 @@ static const int IO_SPEEDUP = [](){
     return 0;
 }();
 
+// void solve() {
+//     int n; cin >> n;
+//     vi temp(n); cin >> temp;
+
+//     bool same = 1;
+//     for (int i = 1; i < n; i++) if (temp[i] != temp[i - 1]) { same = 0; break; }
+//     if (same) { cout << "1\n"; return; }
+
+//     vi a{temp[0]};
+//     for (int i = 1; i < n; i++) if (temp[i] != temp[i - 1]) a.push_back(temp[i]);
+
+//     vi ans{a[0]};
+//     bool up = (a[1] >= a[0]);
+//     int cur = a[0];
+//     for (int i = 1; i < a.size(); i++) {
+//         if (up)
+//         {
+//             if (a[i] < cur) {
+//                 ans.push_back(a[i]);
+//                 up = 0;
+//             }
+//             cur = a[i];
+//         }
+//         else
+//         {
+//             if (a[i] > cur) {
+//                 ans.push_back(a[i]);
+//                 up = 1;
+//             }
+//             cur = a[i];
+//         }
+//     }
+
+//     cout << ans.size() + 1 << endl;
+// }
+
 void solve() {
+    // Solution 2 based on what I understood from the problem statement
     int n; cin >> n;
-    vi temp(n); cin >> temp;
+    vi a(n); cin >> a;
 
-    bool same = 1;
-    for (int i = 1; i < n; i++) if (temp[i] != temp[i - 1]) { same = 0; break; }
-    if (same) { cout << "1\n"; return; }
-
-    vi a{temp[0]};
-    for (int i = 1; i < n; i++) if (temp[i] != temp[i - 1]) a.push_back(temp[i]);
-
-    vi ans{a[0]};
-    bool up = (a[1] >= a[0]);
-    int cur = a[0];
-    for (int i = 1; i < a.size(); i++) {
-        if (up)
-        {
-            if (a[i] < cur) {
-                ans.push_back(a[i]);
-                up = 0;
-            }
-            cur = a[i];
-        }
-        else
-        {
-            if (a[i] > cur) {
-                ans.push_back(a[i]);
-                up = 1;
-            }
-            cur = a[i];
-        }
+    int ans = n = unique(all(a)) - a.begin();
+    for (int i = 1; i < n - 1; i++) {
+        if (a[i + 1] < a[i] && a[i] < a[i - 1]) ans--;
+        if (a[i + 1] > a[i] && a[i] > a[i - 1]) ans--;
     }
 
-    cout << ans.size() + 1 << endl;
+    cout << ans << endl;
 }
 
 const int TESTCASES = 1;
