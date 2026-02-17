@@ -1,3 +1,7 @@
+
+# * It needs ton of changes
+# * Avoid it for now
+
 import os
 
 BASE_DIR = "codeforces"
