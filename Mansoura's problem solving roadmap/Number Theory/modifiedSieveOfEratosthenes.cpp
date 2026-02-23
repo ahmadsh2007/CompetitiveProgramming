@@ -66,7 +66,7 @@ static const int IO_SPEEDUP = [](){
 }();
 
 const int N = 1500000;
-vector<bool> primes(N + 1, 1);
+vector<bool> isPrime(N + 1, 1);
 vector<int> divide(N + 1);
 
 vi primeFactorization(int n) {
@@ -92,12 +92,12 @@ const int TESTCASES = 0;
 signed main() {
     // print("Leeking"); // Yes, it works and yes, it's Python
 
-    primes[0] = primes[1] =0;
+    isPrime[0] = isPrime[1] =0;
     for (int i = 2; i <= N; i++) {
-        if (primes[i]) {
+        if (isPrime[i]) {
             divide[i] = i;
             for (int j = i * i; j <= N; j += i) {
-                primes[j] = 0;
+                isPrime[j] = 0;
                 if (divide[j] == 0) divide[j] = i;
             }
         }

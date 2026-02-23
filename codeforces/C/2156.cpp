@@ -1,3 +1,7 @@
+/*
+       بسم الله الرحمن الرحيم
+    أسالك يا الله التوفيق والنجاح
+*/
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -43,35 +47,32 @@ static const int IO_SPEEDUP = [](){
     return 0;
 }();
 
-const int N = 1e6;
-vector<bool> isPrime(N + 1);
-vector<bool> sieve(int n){vector<bool>p(n+1,true);if(n>=0)p[0]=0;if(n>=1)p[1]=0;for(int i=2;i*i<=n;i++)if(p[i])for(int j=i*i;j<=n;j+=i)p[j]=0;return p;}
-set<int> Tcalc() {
-    set<int> ret;
-    isPrime = sieve(N);
-    for (int i = 2; i <= N; i++) if (isPrime[i]) ret.insert(i * i);
-    return ret;
-}
-set<int> TPrimes(Tcalc());
-
 void solve() {
-    int x; cin >> x;
-    if (TPrimes.find(x) != TPrimes.end()) cout << "YES\n";
-    else cout << "NO\n";
+    int n, k; cin >> n >> k;
+    vi a(n);
+    map<int, int> freq;
+    for (auto &x : a) {
+        cin >> x;
+        freq[x]++;
+    }
+    vi prefix(n + 1);
+    for (int i = 1; i <= n; i++) prefix[i] = prefix[i - 1] + freq[i];
+
+    int ans = 1;
+    for (int i = 1; i <= n; i++) {
+        int x = min(n, 4 * i - 1);
+        int good = n - prefix[x];
+        if (i <= n) good += freq[i];
+        if (2 * i <= n) good += freq[2 * i];
+        if (3 * i <= n) good += freq[3 * i];
+        if (good >= n - k) ans = i;
+    }
+
+    cout << ans << endl;
 }
 
 const int TESTCASES = 1;
 signed main() {
-    #ifndef ONLINE_JUDGE
-    #if __has_include("../../Utils/debug.h")
-      freopen("../../Utils/input.txt", "r", stdin);
-      freopen("../../Utils/output.txt", "w", stdout);
-    #else
-      freopen("../../../Utils/input.txt", "r", stdin);
-      freopen("../../../Utils/output.txt", "w", stdout);
-    #endif
-    #endif
-    
     // print("Leeking"); // Yes, it works and yes, it's Python
 
     ull TTT = 1;
