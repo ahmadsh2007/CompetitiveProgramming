@@ -60,3 +60,48 @@ int main() {
     while (t--) solve();
     return 0;
 }
+
+/*
+vector<vector<int>> adj, comp;
+vector<bool> vis;
+vector<int> tmp;
+
+void DFS(int u) {
+    vis[u] = 1;
+    tmp.push_back(u);
+    for (auto v : adj[u]) {
+        if (!vis[v]) DFS(v);
+    }
+}
+
+void solve() {
+    int n, m; cin >> n >> m;
+    adj.assign(n + 1, {});
+    vis.assign(n + 1, 0);
+
+    for (int i = 0; i < m; i++) {
+        int u, v; cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    int ans = 0;
+    for (int i = 1; i <= n; i++) {
+        if (!vis[i]) {
+            ans++;
+            DFS(i);
+            comp.push_back(tmp);
+            tmp.clear();
+        }
+    }
+
+    for (auto v : comp) {
+        for (auto u : v) {
+            cout << u << ' ';
+        }
+        cout << endl;
+    }
+
+    cout << ans << endl;
+}
+*/
