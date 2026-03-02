@@ -74,7 +74,7 @@ def main() -> int:
     parser.add_argument(
         "--cflags",
         default="-O2 -std=gnu++23 -DONLINE_JUDGE",
-        help='Compiler flags (string). Default: "-O2 -std=gnu++17 -DONLINE_JUDGE"',
+        help='Compiler flags (string). Default: "-O2 -std=gnu++23 -DONLINE_JUDGE"',
     )
     parser.add_argument(
         "--timeout",
