@@ -60,6 +60,21 @@ bool check(int cookie) {
     return need <= k;
 }
 
+// bool check(int cookie) {
+//     int need = 0;
+//     for (int i = 0; i < n; ++i) {
+//         int x = a[i];
+//         int y = b[i];
+//         if ((x * cookie - y) > 0) {
+//             int z = LLONG_MAX - need;
+//             if ((x * cookie - y) > z) return false; 
+//             need += (x * cookie - y);
+//         }
+//     }
+
+//     return need <= k;
+// }
+
 void solve() {
     cin >> n >> k;
     a.assign(n, 0);
