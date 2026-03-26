@@ -157,6 +157,9 @@ def main() -> int:
     print(f"\nRunning {total_runs} times (warmup + {args.n} timed). Skipping run #1 in the average.\n")
 
     for i in range(1, total_runs + 1):
+        # width = len(str(args.n))
+        # * If you want to format the Run # more, uncomment what's above and change the label from:
+        # * else f"Run #{i-1}" to: else f"Run #{i-1:0{width}d}"
         label = f"Warmup #{i}" if i == 1 else f"Run #{i-1}"
 
         try:
