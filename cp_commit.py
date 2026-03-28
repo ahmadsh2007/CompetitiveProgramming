@@ -57,7 +57,7 @@ def main():
 
     commits_today = data["daily_commits"].get(today_str, 0) + 1
 
-    msg = f"Day {day_number:03d} Work Day {work_day_number:03d} Commit {commits_today:02d}"
+    msg = f"Work Day {work_day_number:03d} Commit {commits_today:02d}"
 
     print(f"\n{CYAN}📌 Commit preview:{RESET}")
     print(f"   \"{msg}\"\n")
