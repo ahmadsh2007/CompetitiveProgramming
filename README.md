@@ -19,19 +19,22 @@ Welcome to my Competitive Programming (CP) repository! This repository is struct
 ```
 CompetitiveProgramming/
 ├─ JUST ACM/
-│  ├─ Templates/
-│  ├─ 2024 Training - Beginner
-│  ├─ 2025 Training - Junior
-│  └─ 2026 Training - Beginner
+├─ Mansoura's problem solving roadmap/
+├─ template/
+├─ codeforces/
+│  └─ YYYY/
+│     └─ ContestName/
+├─ vjudge/
 ├─ Utils/
 │  ├─ debug.h
 │  ├─ input.txt
 │  └─ output.txt
-├─ codeforces/
-│  └─ YYYY/
-│     └─ ContestName/          
 ├─ helper.py
+├─ CP_Notebook.md
+├─ CheatSheet.pdf
+├─ bench_cpp.py
 ├─ cp_commit.py
+├─ LICENSE
 └─ README.md
 ```
 
