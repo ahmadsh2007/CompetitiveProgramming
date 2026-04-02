@@ -11,3 +11,4 @@ DDebug.dSYM/
 Temp/
 *.bin
 build/
+.idea/
