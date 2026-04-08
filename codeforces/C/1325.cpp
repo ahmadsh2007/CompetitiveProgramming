@@ -55,9 +55,6 @@ void solve() {
     vector<bool> vis(n + 1);
     vector<pair<pair<int, int>, int>> edges;
 
-    set<int> s;
-    for (int i = 0; i <= n - 2; ++i) s.insert(i);
-
     for (int i = 1; i < n; ++i) {
         int u, v; cin >> u >> v;
         adj[u].push_back(v);
@@ -73,12 +70,8 @@ void solve() {
         int val = 0;
         int mx  = n - 2;
         for (int i = 0; i < (int) edges.size(); ++i) {
-            if (edges[i].first.first == node) {
-                edges[i].second = val++;
-            }
-            else if (edges[i].first.second == node) {
-                edges[i].second = val++;
-            }
+            int edge = edges[i].first.first == node || edges[i].first.second == node;
+            if (edge) edges[i].second = val++;
             else edges[i].second = mx--;
         }
 
