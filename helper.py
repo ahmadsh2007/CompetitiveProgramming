@@ -1,8 +1,13 @@
-n = 999
+n = 100000
 # for _ in range(n):
 #     print(100 - _, end=" ")
 
 import random
-print(n)
+# print(n)
+arr = []
 for _ in range(n):
-    print(random.randint(0, n), end=" ")
+    # print(_ + 1, end="\n")
+    arr.append(_ + 1)
+
+with open("output.txt", "w") as f:
+    f.write("\n".join(map(str, arr)))
