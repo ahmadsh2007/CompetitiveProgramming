@@ -34,12 +34,73 @@ static const int IO_SPEEDUP = [](){
 }();
 
 
+// void solve() {
+//     int n, m; cin >> n >> m;
+    
+//     vector<vector<int>> adj(n + 1);
+//     vector<bool> visited(n + 1);
+//     vector<int> distance(n + 1, 1e9);
+
+//     for (int i = 0; i < m; ++i) {
+//         int u, v; cin >> u >> v;
+
+//         adj[u].push_back(v);
+//         adj[v].push_back(u);
+//     }
+
+//     queue<int> q;
+//     distance[1] = 1;
+//     q.push(1);
+//     visited[1] = 1;
+
+//     while (!q.empty()) {
+//         int u = q.front();
+//         q.pop();
+
+//         for (auto &v : adj[u]) {
+//             if (visited[v]) continue;
+//             visited[v] = 1;
+//             distance[v] = min(distance[v], distance[u] + 1);
+//             q.push(v);
+//         }
+//     }
+
+//     vector<int> ans = {n};
+//     for (int i = 1; i <= n; ++i) visited[i] = 0;
+
+//     q.push(n);
+//     visited[n] = 1;
+//     while (!q.empty()) {
+//         int u = q.front();
+//         q.pop();
+
+//         for (auto &v : adj[u]) {
+//             if (visited[v]) continue;
+
+//             visited[v] = 1;
+//             if (distance[v] == distance[u] - 1) {
+//                 ans.push_back(v);
+//                 while (!q.empty()) q.pop();
+//                 q.push(v);
+//                 break;
+//             }
+//         }
+//     }
+
+//     if (distance[n] == 1e9) cout << "IMPOSSIBLE\n";
+//     else {
+//         cout << distance[n] << endl;
+//         for (int i = (int) ans.size() - 1; i >= 0; --i) cout << ans[i] << " \n"[i == 0];
+//     }
+// }
+
 void solve() {
     int n, m; cin >> n >> m;
     
     vector<vector<int>> adj(n + 1);
     vector<bool> visited(n + 1);
     vector<int> distance(n + 1, 1e9);
+    vector<int> parent(n + 1, 1e9);
 
     for (int i = 0; i < m; ++i) {
         int u, v; cin >> u >> v;
@@ -60,39 +121,29 @@ void solve() {
         for (auto &v : adj[u]) {
             if (visited[v]) continue;
             visited[v] = 1;
-            distance[v] = min(distance[v], distance[u] + 1);
+            distance[v] = distance[u] + 1;
+            parent[v] = u;
             q.push(v);
         }
     }
 
-    vector<int> ans = {n};
-    for (int i = 1; i <= n; ++i) visited[i] = 0;
+    if (distance[n] == 1e9) { cout << "IMPOSSIBLE\n"; return; }
 
-    q.push(n);
-    visited[n] = 1;
-    while (!q.empty()) {
-        int u = q.front();
-        q.pop();
+    cout << distance[n] << endl;
 
-        for (auto &v : adj[u]) {
-            if (visited[v]) continue;
+    vector<int> path;
+    int cur = n;
 
-            visited[v] = 1;
-            if (distance[v] == distance[u] - 1) {
-                ans.push_back(v);
-                while (!q.empty()) q.pop();
-                q.push(v);
-                break;
-            }
-        }
+    while (cur != 1) {
+        path.push_back(cur);
+        cur = parent[cur];
     }
 
-    if (distance[n] == 1e9) cout << "IMPOSSIBLE\n";
-    else {
-        cout << distance[n] << endl;
-        for (int i = (int) ans.size() - 1; i >= 0; --i) cout << ans[i] << " \n"[i == 0];
-    }
+    cout << "1 ";
+    for (int i = (int) path.size() - 1; i >= 0; --i)
+        cout << path[i] << " \n"[i == 0];
 }
+
 
 signed main() {
     // print("Leeking"); // Yes, it works and yes, it's Python
