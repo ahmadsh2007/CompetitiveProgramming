@@ -1,6 +1,6 @@
 /*
        بسم الله الرحمن الرحيم
-    أسالك يا الله التوفيق والنجاح
+    أسالك يا الله التوفيق والنجاح
 */
 #include <bits/stdc++.h>
 using namespace std;
@@ -50,38 +50,26 @@ static const int IO_SPEEDUP = [](){
 int dx[] = {-1, 1, 0, 0};
 int dy[] = {0, 0, -1, 1};
 
-int check(const int i, const int n, const vector<int> & a) {
-    for (int j = 0; j < i; ++j) {
-        bool AllOnes = 1;
-        bool AllZero = 1;
-        for (int k = j; k < n; j += i) {
-            if (a[k] == 1) AllZero = 0;
-            else AllOnes = 0;
-        }
-
-        if (!AllOnes && !AllZero) return 0;
-    }
-    return 1;
-}
-
 void solve() {
     int n; cin >> n;
-    vi a(n); cin >> a;
-
-    // for (int i = 0; i < n; ++i) a[i] %= 2;
+    vector<int> a(n);
+    for (auto &x : a) cin >> x;
 
     vector<int> divisors;
-    for (int i = 1; i * i <= n; ++i) if (n % i == 0) {
-        divisors.push_back(i);
-        if (i * i != n) divisors.push_back(n / i);
-    }
+    const int div = [&]() -> int {
+        for (int i = 1; i * i <= n; ++i) if (n % i == 0) {
+            divisors.push_back(i);
+            if (i * i != n) divisors.push_back(n / i);
+        }
+        return 0;
+    }();
 
     int ans = 0;
+    // X mod m ≡ Y mod m -> (X - Y) ≡ 0 (mod m)
     for (auto &k : divisors) {
         int m = 0;
-        for (int i = k; i < n; i++) {
-            m = gcd(m, abs(a[i] - a[i - k]));
-        }
+        for (int i = k; i < n; ++i) m = gcd(m, abs(a[i] - a[i - k]));
+
         if (m != 1) ans++;
     }
 
