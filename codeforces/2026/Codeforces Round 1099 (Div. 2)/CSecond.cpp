@@ -57,6 +57,7 @@ struct NodeData {
 };
 
 void solve() {
+    // It will get a TLE
     int n; cin >> n;
     vi a(n); cin >> a;
  

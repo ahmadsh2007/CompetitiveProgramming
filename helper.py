@@ -7,7 +7,7 @@ import random
 arr = []
 for _ in range(n):
     # print(_ + 1, end="\n")
-    arr.append(_ + 1)
+    arr.append(random.randint(10**7, 10**9))
 
 with open("output.txt", "w") as f:
     f.write("\n".join(map(str, arr)))
