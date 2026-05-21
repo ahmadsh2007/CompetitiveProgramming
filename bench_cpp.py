@@ -30,22 +30,95 @@ def normalize_output(s: str, ignore_trailing_ws: bool) -> str:
     return s.rstrip("\n")
 
 
-def run_program(exe_path: Path, input_text: str, timeout: float | None) -> tuple[float, str, str, int]:
+def run_program(exe_path: Path, input_text: str, timeout: float | None) -> tuple[float, str, str, int, float]:
+    cmd = [str(exe_path)]
+    time_tool = None
+
+    if sys.platform == "linux" and os.path.exists("/usr/bin/time"):
+        cmd = ["/usr/bin/time", "-f", "%M", str(exe_path)]
+        time_tool = "linux"
+    elif sys.platform == "darwin" and os.path.exists("/usr/bin/time"):
+        cmd = ["/usr/bin/time", "-l", str(exe_path)]
+        time_tool = "mac"
+
     start = time.perf_counter_ns()
-    p = subprocess.run(
-        [str(exe_path)],
-        input=input_text,
+    
+    with subprocess.Popen(
+        cmd,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True,
-        capture_output=True,
-        timeout=timeout,
-    )
+    ) as p:
+        try:
+            stdout, stderr = p.communicate(input=input_text, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            p.kill()
+            stdout, stderr = p.communicate()
+            raise subprocess.TimeoutExpired(p.args, timeout, output=stdout, stderr=stderr)
+        
+        peak_mem_mb = 0.0
+        
+        # Cross-Platform Peak Working Set Retrieval
+        if sys.platform == "win32":
+            import ctypes
+            from ctypes import wintypes
+            class PROCESS_MEMORY_COUNTERS(ctypes.Structure):
+                _fields_ = [
+                    ("cb", wintypes.DWORD),
+                    ("PageFaultCount", wintypes.DWORD),
+                    ("PeakWorkingSetSize", ctypes.c_size_t),
+                    ("WorkingSetSize", ctypes.c_size_t),
+                    ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+                    ("QuotaPagedPoolUsage", ctypes.c_size_t),
+                    ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+                    ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+                    ("PagefileUsage", ctypes.c_size_t),
+                    ("PeakPagefileUsage", ctypes.c_size_t),
+                ]
+            counters = PROCESS_MEMORY_COUNTERS()
+            counters.cb = ctypes.sizeof(counters)
+            psapi = ctypes.WinDLL('psapi')
+            # Fetch from active handle before Popen goes out of scope and is Garbage Collected
+            if psapi.GetProcessMemoryInfo(int(p._handle), ctypes.byref(counters), counters.cb):
+                peak_mem_mb = counters.PeakWorkingSetSize / (1024 * 1024)
+
     end = time.perf_counter_ns()
     elapsed_ms = (end - start) / 1_000_000.0
-    return elapsed_ms, p.stdout, p.stderr, p.returncode
 
+    # Parse stderr for Unix based timing tools where the overhead prints alongside standard output
+    if time_tool == "linux":
+        lines = stderr.strip('\r\n').split('\n')
+        if lines:
+            try:
+                # /usr/bin/time -f "%M" outputs Peak RSS in KB
+                peak_mem_mb = float(lines[-1].strip()) / 1024.0
+                stderr = '\n'.join(lines[:-1])
+                if stderr: stderr += '\n'
+            except ValueError:
+                pass
+    elif time_tool == "mac":
+        lines = stderr.split('\n')
+        clean_stderr = []
+        for line in lines:
+            if 'maximum resident set size' in line:
+                try:
+                    # mac outputs in bytes
+                    peak_mem_mb = float(line.split()[0]) / (1024 * 1024)
+                except ValueError:
+                    pass
+            elif line.strip().endswith('real') or line.strip().endswith('user') or line.strip().endswith('sys') or "maximum resident set size" in line:
+                continue
+            else:
+                clean_stderr.append(line)
+        stderr = '\n'.join(clean_stderr)
+
+    return elapsed_ms, stdout, stderr, p.returncode, peak_mem_mb
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Compile + run C++ (n+1) times, skip first in average, verify output.")
+    parser = argparse.ArgumentParser(
+        description="Compile + run C++ (n+1) times, skip first in average, verify output & memory."
+        )
     parser.add_argument(
         "-n", 
         type=int, 
@@ -74,14 +147,20 @@ def main() -> int:
     parser.add_argument(
         "--cflags",
         default="-O2 -std=gnu++23 -DONLINE_JUDGE",
-        help='Compiler flags (string). Default: "-O2 -std=gnu++23 -DONLINE_JUDGE"',
-    )
+        help='Compiler flags (string). Default: "-O2 -std=gnu++23 -DONLINE_JUDGE"'
+        )
     parser.add_argument(
         "--timeout",
         type=float,
         default=2.0,
-        help="Per-run timeout seconds. Default: 2.0 (more Codeforces-like; override per problem)",
-    )
+        help="Per-run timeout seconds. Default: 2.0 (more Codeforces-like; override per problem)"
+        )
+    parser.add_argument(
+        "--mem-limit",
+        type=float,
+        default=256.0,
+        help="Memory Limit Exceeded (MLE) threshold in MB. Default: 256.0 (Codeforces default)"
+        )
     parser.add_argument(
         "--no-timeout",
         action="store_true",
@@ -91,19 +170,19 @@ def main() -> int:
         dest="ignore_trailing_ws",
         action="store_true",
         default=True,
-        help="Ignore trailing whitespace differences per line (default: ON, CF-ish)",
-    )
+        help="Ignore trailing whitespace differences per line (default: ON, CF-ish)"
+        )
     parser.add_argument(
         "--strict-ws",
         dest="ignore_trailing_ws",
         action="store_false",
-        help="Strict whitespace (disable ignoring trailing whitespace)",
-    )
+        help="Strict whitespace (disable ignoring trailing whitespace)"
+        )
     parser.add_argument(
         "--keep-going",
         action="store_true",
-        help="If output mismatch occurs, keep timing runs anyway (still reports mismatch)",
-    )
+        help="If output mismatch occurs, keep timing runs anyway (still reports mismatch)"
+        )
     args = parser.parse_args()
 
     if args.n < 1:
@@ -152,6 +231,7 @@ def main() -> int:
 
     total_runs = args.n + 1  # warmup + n timed
     times_ms: list[float] = []
+    mems_mb: list[float] = []
     mismatch_found = False
 
     print(f"\nRunning {total_runs} times (warmup + {args.n} timed). Skipping run #1 in the average.\n")
@@ -163,40 +243,53 @@ def main() -> int:
         label = f"Warmup #{i}" if i == 1 else f"Run #{i-1}"
 
         try:
-            t_ms, stdout, stderr, code = run_program(exe_path, input_text, timeout)
+            t_ms, stdout, stderr, code, mem_mb = run_program(exe_path, input_text, timeout)
         except subprocess.TimeoutExpired:
-            print(f"{label}: TIMEOUT after {timeout}s", file=sys.stderr)
+            print(f"{label:>10}: TIMEOUT after {timeout}s", file=sys.stderr)
             return 1
 
         got = normalize_output(stdout, args.ignore_trailing_ws)
-        ok = (code == 0) and (got == expected)
+        ok = (code == 0) and (got == expected) and (mem_mb <= args.mem_limit)
 
-        status = "OK" if ok else "FAIL"
-        print(f"{label:>10}: {t_ms:>10.3f} ms   [{status}]   exit={code}")
+        if mem_mb > args.mem_limit:
+            status = "MLE"
+        elif code != 0:
+            status = "RE"
+        elif got != expected:
+            status = "WA"
+        else:
+            status = "OK"
+
+        print(f"{label:>10}: {t_ms:>10.3f} ms  |  {mem_mb:>6.2f} MB   [{status}]   exit={code}")
 
         if not ok:
             mismatch_found = True
-            if code != 0:
+            if status == "MLE":
+                print(f"\n--- Memory Limit Exceeded! Used {mem_mb:.2f} MB > {args.mem_limit:.2f} MB ---", file=sys.stderr)
+            elif code != 0:
                 print("\n--- Program stderr ---\n" + stderr, file=sys.stderr)
-
-            print("\n--- Expected (first 400 chars) ---")
-            print(expected[:400])
-            print("\n--- Got (first 400 chars) ---")
-            print(got[:400])
+            elif status == "WA":
+                print("\n--- Expected (first 400 chars) ---")
+                print(expected[:400])
+                print("\n--- Got (first 400 chars) ---")
+                print(got[:400])
 
             if not args.keep_going:
                 print("\nStopping due to mismatch. (Use --keep-going to continue timing anyway.)", file=sys.stderr)
                 return 1
 
         times_ms.append(t_ms)
+        mems_mb.append(mem_mb)
 
     timed = times_ms[1:]
     avg_ms = sum(timed) / len(timed)
+    peak_mem_overall = max(mems_mb)
 
     print("\nSummary")
     print(f"- Warmup run #1: {times_ms[0]:.3f} ms (excluded)")
     print(f"- Timed runs: {len(timed)}")
     print(f"- Average (runs #2..#{total_runs}): {avg_ms:.3f} ms")
+    print(f"- Peak Memory: {peak_mem_overall:.2f} MB")
     print(f"- Output check: {'PASSED' if not mismatch_found else 'FAILED (see above)'}")
 
     return 0 if not mismatch_found else 1
