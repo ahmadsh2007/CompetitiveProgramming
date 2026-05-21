@@ -21,6 +21,13 @@ import sys
 import time
 from pathlib import Path
 
+RED = "\033[31m"
+GREEN = "\033[32m"
+RESET = "\033[0m"
+
+# Optional additions for better logs:
+YELLOW = "\033[33m"
+BOLD = "\033[1m"
 
 def normalize_output(s: str, ignore_trailing_ws: bool) -> str:
     # Normalize line endings across OS
@@ -253,19 +260,23 @@ def main() -> int:
 
         if mem_mb > args.mem_limit:
             status = "MLE"
+            color = RED
         elif code != 0:
             status = "RE"
+            color = RED
         elif got != expected:
             status = "WA"
+            color = RED
         else:
             status = "OK"
+            color = GREEN
 
-        print(f"{label:>10}: {t_ms:>10.3f} ms  |  {mem_mb:>6.2f} MB   [{status}]   exit={code}")
+        print(f"{label:>10}: {t_ms:>10.3f} ms  |  {mem_mb:>6.2f} MB   [{color}{status}{RESET}]   exit={code}")
 
         if not ok:
             mismatch_found = True
             if status == "MLE":
-                print(f"\n--- Memory Limit Exceeded! Used {mem_mb:.2f} MB > {args.mem_limit:.2f} MB ---", file=sys.stderr)
+                print(f"\n--- Memory Limit Exceeded! Used {RED}{mem_mb:.2f} MB{RESET} > {YELLOW}{args.mem_limit:.2f} MB{RESET} ---", file=sys.stderr)
             elif code != 0:
                 print("\n--- Program stderr ---\n" + stderr, file=sys.stderr)
             elif status == "WA":
@@ -275,7 +286,7 @@ def main() -> int:
                 print(got[:400])
 
             if not args.keep_going:
-                print("\nStopping due to mismatch. (Use --keep-going to continue timing anyway.)", file=sys.stderr)
+                print(f"\n{RED}{BOLD}Stopping due to mismatch.{RESET} (Use --keep-going to continue timing anyway.)", file=sys.stderr)
                 return 1
 
         times_ms.append(t_ms)
@@ -288,9 +299,9 @@ def main() -> int:
     print("\nSummary")
     print(f"- Warmup run #1: {times_ms[0]:.3f} ms (excluded)")
     print(f"- Timed runs: {len(timed)}")
-    print(f"- Average (runs #2..#{total_runs}): {avg_ms:.3f} ms")
-    print(f"- Peak Memory: {peak_mem_overall:.2f} MB")
-    print(f"- Output check: {'PASSED' if not mismatch_found else 'FAILED (see above)'}")
+    print(f"- Average (runs #2..#{total_runs}): {GREEN}{avg_ms:.3f} ms{RESET}")
+    print(f"- Peak Memory: {GREEN}{peak_mem_overall:.2f} MB{RESET}")
+    print(f"- Output check: {f'{GREEN}PASSED{RESET}' if not mismatch_found else f'{RED}FAILED{RESET} (see above)'}")
 
     return 0 if not mismatch_found else 1
 
