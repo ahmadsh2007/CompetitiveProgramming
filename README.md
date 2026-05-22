@@ -49,8 +49,8 @@ This is the template I use for all my C++ solutions:
 
 ```cpp
 /*
-       بسم الله الرحمن الرحيم
-    أسالك يا الله التوفيق والنجاح
+      In the name of Allah, the Most Merciful
+   I ask You, O Allah, for guidance and success
 */
 #include <bits/stdc++.h>
 using namespace std;
