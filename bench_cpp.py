@@ -221,7 +221,7 @@ def main() -> int:
     expected_raw = out_path.read_text(encoding="utf-8", errors="replace")
     expected = normalize_output(expected_raw, args.ignore_trailing_ws)
 
-    build_dir = script_dir / "build"
+    build_dir = script_dir / "bin"
     build_dir.mkdir(exist_ok=True)
 
     exe_name = cpp_path.stem + (".exe" if os.name == "nt" else "")
