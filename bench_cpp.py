@@ -286,7 +286,7 @@ def main() -> int:
                 print(got[:400])
 
             if not args.keep_going:
-                print(f"\n{RED}{BOLD}Stopping due to mismatch.{RESET} (Use --keep-going to continue timing anyway.)", file=sys.stderr)
+                print(f"\n{RED}{BOLD}Stopping due to mismatch.{RESET} (Use {YELLOW}--keep-going{RESET} to continue timing anyway.)", file=sys.stderr)
                 return 1
 
         times_ms.append(t_ms)
