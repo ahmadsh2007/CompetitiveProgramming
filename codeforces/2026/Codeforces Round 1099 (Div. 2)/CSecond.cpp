@@ -1,9 +1,12 @@
 /*
-       بسم الله الرحمن الرحيم
+        بسم الله الرحمن الرحيم
     أسالك يا الله التوفيق والنجاح
 */
 #include <bits/stdc++.h>
+#include <chrono>
+#include <ext/pb_ds/assoc_container.hpp>
 using namespace std;
+using namespace __gnu_pbds;
 
 // Vector input/output operators
 // I wish I could just do `v = list(map(int, input().split()))` instead of this boilerplate
@@ -51,41 +54,50 @@ static const int IO_SPEEDUP = [](){
 int dx[] = {-1, 1, 0, 0};
 int dy[] = {0, 0, -1, 1};
 
-struct NodeData {
-    int freq = 0;
-    int sum  = 0;
+struct custom_hash {
+    static uint64_t splitmix64(uint64_t x) {
+        x += 0x9e3779b97f4a7c15;
+        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
+        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
+        return x ^ (x >> 31);
+    }
+
+    size_t operator()(uint64_t x) const {
+        static const uint64_t FIXED_RANDOM = std::chrono::steady_clock::now().time_since_epoch().count();
+        return splitmix64(x + FIXED_RANDOM);
+    }
 };
 
 void solve() {
-    // It will get a TLE
     int n; cin >> n;
     vi a(n); cin >> a;
- 
-    map<int, NodeData> mp;
- 
+
+    // Replaced standard map with fast hash table
+    gp_hash_table<int, int, custom_hash> freq;
+    gp_hash_table<int, int, custom_hash> sum;
+
     for (int i = 0; i < n; ++i) {
         int cur = a[i];
         int moves = 0;
- 
+
         bool visTwo = 1, visOne = 1;
         while (visTwo || visOne) {
             if (cur == 2) visTwo = 0;
             else if (cur == 1) visOne = 0;
             
-            NodeData & data = mp[cur];
-            data.freq++;
-            data.sum += moves++;
- 
+            freq[cur]++;
+            sum[cur] += moves++;
+
             if (cur % 2) cur++;
             else cur >>= 1;
         }
     }
- 
+
     int ans = LLONG_MAX;
-    for (const auto & x : mp) {
-        if (x.second.freq == n) ans = min(ans, x.second.sum);
+    for (auto x : freq) {
+        if (x.second == n) ans = min(ans, sum[x.first]);
     }
- 
+
     cout << ans << endl;
 }
 
