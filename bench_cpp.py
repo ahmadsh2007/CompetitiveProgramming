@@ -149,8 +149,8 @@ def main() -> int:
         help="Expected output file path. Default: output.txt")
     parser.add_argument(
         "--compiler",
-        default="g++",
-        help="Compiler command. Default: g++")
+        default="g++-15",
+        help="Compiler command. Default: g++-15")
     parser.add_argument(
         "--cflags",
         default="-O2 -std=gnu++23 -DONLINE_JUDGE",
