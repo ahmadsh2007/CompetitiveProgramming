@@ -48,6 +48,7 @@ struct custom_hash {
 #define sz(x) (int)(x).size()
 #define endl '\n'
 #define int long long
+#define double long double
 #define str string // What a Python
 
 #define vi   vector<int>
@@ -81,22 +82,38 @@ int dx[] = {-1, 1, 0, 0};
 int dy[] = {0, 0, -1, 1};
 
 void solve() {
-    int n; 
-    cin >> n;
-    vi x(n); cin >> x;
-    vi t(n); cin >> t;
-    
-    double mx = x[0] + t[0];
-    double mn = x[0] - t[0];
+    int n; cin >> n;
+    vector<double> x(n); cin >> x;
+    vector<double> t(n); cin >> t;
 
-    for (int i = 1; i < n; ++i) {
-        mx = max(mx, double(x[i] + t[i]));
-        mn = min(mn, double(x[i] - t[i]));
+    double best = 0;
+
+    auto check = [&](double mid) -> bool {
+        double L = 0, R = 1e8;
+        for (int i = 0; i < n; ++i) {
+            double distance = max((double) 0, mid - t[i]);
+
+            double l = x[i] - distance;
+            double r = x[i] + distance;
+
+            L = max(L, l);
+            R = min(R, r);
+
+            if (R < L) return false;
+        }
+
+        best = (L + R) / 2;
+        return true;
+    };
+
+    double l = 0, r = 1e9;
+    for (int i = 0; i < 70; ++i) {
+        double mid = (r + l) / 2;
+        if (check(mid)) r = mid;
+        else l = mid;
     }
 
-    double ans = (mx + mn) / 2.0;
-    
-    cout << fixed << setprecision(7) << ans << "\n";
+    cout << setprecision(17) << best << endl;
 }
 
 const int TESTCASES = 1;
