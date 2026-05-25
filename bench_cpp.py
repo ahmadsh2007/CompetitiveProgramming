@@ -134,6 +134,7 @@ def main() -> int:
         )
     parser.add_argument(
         "--cpp",
+        default="file.cpp",
         help="C++ source file path. Default: file.cpp"
         )
     parser.add_argument(
