@@ -53,3 +53,8 @@ bool isBipartiteBFS(int n, const vector<vector<int>>& adjList) {
     }
     return true;
 }
+
+/*
+ * You can check:
+ * CF: 1702E
+ */
