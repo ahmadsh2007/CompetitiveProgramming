@@ -1,0 +1,1 @@
+[1526B](https://codeforces.com/problemset/problem/1526/B)
