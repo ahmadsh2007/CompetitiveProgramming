@@ -1,0 +1,180 @@
+/*
+       بسم الله الرحمن الرحيم
+    أسالك يا الله التوفيق والنجاح
+*/
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+using namespace std;
+
+// Vector input/output operators
+// I wish I could just do `v = list(map(int, input().split()))` instead of this boilerplate
+template<class T>
+istream& operator>>(istream& in, vector<T>& v){
+    for(auto& x:v) in>>x;
+    return in;
+}
+// I wish I could just do `print(*v)` instead of this boilerplate
+template<class T>
+ostream& operator<<(ostream& out, vector<T>& v){
+    for(auto& x:v) out<<x<<' ';
+    return out;
+}
+
+struct custom_hash {
+    static uint64_t splitmix64(uint64_t x) {
+        // http://xorshift.di.unimi.it/splitmix64.c
+        x += 0x9e3779b97f4a7c15;
+        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
+        x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
+        return x ^ (x >> 31);
+    }
+
+    size_t operator()(uint64_t x) const {
+        // Generates a random seed once per program execution
+        static const uint64_t FIXED_RANDOM = std::chrono::steady_clock::now().time_since_epoch().count();
+        return splitmix64(x + FIXED_RANDOM);
+    }
+    // Safe O(1) Map
+    // std::unordered_map<long long, int, custom_hash> safe_map;
+    // Safe O(1) Set
+    // std::unordered_set<long long, custom_hash> safe_set;
+    // Fastest, safest map for CP
+    // gp_hash_table<long long, int, custom_hash> fast_safe_map;
+};
+
+#define all(x) (x).begin(), (x).end()
+#define rall(x) (x).rbegin(), (x).rend()
+#define sz(x) (int)(x).size()
+#define endl '\n'
+#define int long long
+#define str string // What a Python
+
+#define vi   vector<int>
+#define vill vector<ll>
+#define read(v) for (auto &x : v) cin >> x;
+#define cin(v)  for (auto &x : v) cin >> x;
+#define cout(v) for (auto &x : v) cout << x << ' ';
+
+using ll  = long long;
+using ull = unsigned long long;
+
+using u128 = unsigned __int128;
+using i128 = __int128;
+
+const int MOD = 1e9 + 7;
+const long long INF = 1e9 + 7;
+const int MAX_A = 1e6;
+
+static const int IO_SPEEDUP = [](){
+    ios::sync_with_stdio(false);
+    cout.tie(nullptr);
+    cin.tie(nullptr);
+    return 0;
+}();
+
+// Macro to generate a random integer between l and r (inclusive)
+// To use: `ll my_random_number = rnd(1, 100);` or `int random_index = rnd(0, my_vector.size() - 1);`
+std::mt19937_64 rng(std::chrono::steady_clock::now().time_since_epoch().count());
+#define rnd(l, r) std::uniform_int_distribution<ll>(l, r)(rng)
+
+int dx[] = {-1, 1, 0, 0};
+int dy[] = {0, 0, -1, 1};
+
+void solve() {
+    int n; cin >> n;
+    vector<int> p(n);
+    for (int i = 0; i < n; ++i) cin >> p[i];
+    vector<int> c(n);
+    for (int i = 0; i < n; ++i) cin >> c[i];
+    int m; cin >> m;
+    vector<int> tp(m), tc(m), d(m);
+    for (int i = 0; i < m; ++i) cin >> tp[i];
+    for (int i = 0; i < m; ++i) cin >> tc[i];
+    for (int i = 0; i < m; ++i) cin >> d[i];
+
+    int globalMinSum = INF;
+    vector<int> minCAtP(MAX_A + 2, INF);
+    vector<int> minPAtC(MAX_A + 2, INF);
+
+    for (int i = 0; i < n; ++i) {
+        globalMinSum = min(globalMinSum, p[i] + c[i]);
+        minCAtP[p[i]] = min(minCAtP[p[i]], c[i]);
+        minPAtC[c[i]] = min(minPAtC[c[i]], p[i]);
+    }
+
+    vector<int> preMinCP(MAX_A + 2, INF);
+    vector<int> sufMinCP(MAX_A + 2, INF);
+    vector<int> preMinPC(MAX_A + 2, INF);
+    vector<int> sufMinPC(MAX_A + 2, INF);
+
+    preMinCP[0] = minCAtP[0];
+    preMinPC[0] = minPAtC[0];
+    for (int i = 1; i <= MAX_A; ++i) {
+        preMinCP[i] = min(preMinCP[i - 1], minCAtP[i]);
+        preMinPC[i] = min(preMinPC[i - 1], minPAtC[i]);
+    }
+
+    sufMinCP[MAX_A] = minCAtP[MAX_A];
+    sufMinPC[MAX_A] = minPAtC[MAX_A];
+    for (int i = MAX_A; i >= 0; --i) {
+        sufMinCP[i] = min(sufMinCP[i + 1], minCAtP[i]);
+        sufMinPC[i] = min(sufMinPC[i + 1], minPAtC[i]);
+    }
+
+    for (int i = 0; i < m; ++i) {
+        int ans = INF;
+
+        if (tp[i] > 0) {
+            int limit = min(tp[i] - 1, MAX_A);
+            int minC = preMinCP[limit];
+            if (minC != INF) {
+                int I = (minC < tc[i]) ? 0 : ((minC >= tc[i] + d[i]) ? tc[i] + d[i] : minC);
+                ans = min(ans, I);
+            }
+        }
+        if (tc[i] > 0) {
+            int limit = min(tc[i] - 1, MAX_A);
+            int minP = preMinPC[limit];
+            if (minP != INF) {
+                int I = (minP < tp[i]) ? 0 : ((minP >= tp[i] + d[i]) ? tp[i] + d[i] : minP);
+                ans = min(ans, I);
+            }
+        }
+        if (tp[i] + d[i] <= MAX_A) {
+            int minC = sufMinCP[tp[i] + d[i]];
+            if (minC != INF) {
+                int I = (minC < tc[i]) ? 0 : ((minC >= tc[i] + d[i]) ? tc[i] + d[i] : minC);
+                ans = min(ans, I + tp[i] + d[i]);
+            }
+        }
+        if (tc[i] + d[i] <= MAX_A) {
+            int minP = sufMinPC[tc[i] + d[i]];
+            if (minP != INF) {
+                int I = (minP < tp[i]) ? 0 : ((minP >= tp[i] + d[i]) ? tp[i] + d[i] : minP);
+                ans = min(ans, I + tc[i] + d[i]);
+            }
+        }
+        if (globalMinSum != INF) ans = min(ans, globalMinSum);
+
+        cout << ans << endl;
+    }
+}
+
+const int TESTCASES = 0;
+signed main() {
+    #ifndef ONLINE_JUDGE
+      freopen("../../Utils/input.txt", "r", stdin);
+    #endif
+    // print("Leeking"); // Yes, it works and yes, it's Python
+
+    ull TTT = 1;
+    if (TESTCASES == 1) cin >> TTT;
+    else if (TESTCASES == 2) {
+    #ifndef LOCAL
+      cin >> TTT;
+    #endif
+    }
+    while (TTT--) solve();
+    return 0;
+}
