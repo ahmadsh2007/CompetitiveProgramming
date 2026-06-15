@@ -13,3 +13,13 @@ def fib_memo(n):
     return fib(n, memo)
 
 print(fib_memo(100))
+
+def fib2(n):
+    val = [None] * 3;
+    val[0] = 0
+    val[1] = 1
+    for _ in range(2, n + 1):
+        val[_ % 3] = val[(_ - 1) % 3] + val[(_ - 2) % 3];
+    return val[n % 3]
+
+print(fib2(100))
