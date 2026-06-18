@@ -56,18 +56,34 @@ def run_program(exe_path: Path, input_text: str, timeout: float | None) -> tuple
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
+        encoding="utf-8",
     ) as p:
+        
+        dup_handle = None
+        if sys.platform == "win32":
+            import _winapi
+            dup_handle = _winapi.DuplicateHandle(
+                _winapi.GetCurrentProcess(),
+                p._handle,
+                _winapi.GetCurrentProcess(),
+                0,
+                False,
+                _winapi.DUPLICATE_SAME_ACCESS
+            )
+
         try:
             stdout, stderr = p.communicate(input=input_text, timeout=timeout)
         except subprocess.TimeoutExpired:
             p.kill()
             stdout, stderr = p.communicate()
+            if dup_handle is not None:
+                import _winapi
+                _winapi.CloseHandle(dup_handle)
             raise subprocess.TimeoutExpired(p.args, timeout, output=stdout, stderr=stderr)
         
         peak_mem_mb = 0.0
         
-        # Cross-Platform Peak Working Set Retrieval
-        if sys.platform == "win32":
+        if sys.platform == "win32" and dup_handle is not None:
             import ctypes
             from ctypes import wintypes
             class PROCESS_MEMORY_COUNTERS(ctypes.Structure):
@@ -86,9 +102,16 @@ def run_program(exe_path: Path, input_text: str, timeout: float | None) -> tuple
             counters = PROCESS_MEMORY_COUNTERS()
             counters.cb = ctypes.sizeof(counters)
             psapi = ctypes.WinDLL('psapi')
-            # Fetch from active handle before Popen goes out of scope and is Garbage Collected
-            if psapi.GetProcessMemoryInfo(int(p._handle), ctypes.byref(counters), counters.cb):
-                peak_mem_mb = counters.PeakWorkingSetSize / (1024 * 1024)
+            
+            psapi.GetProcessMemoryInfo.argtypes = [wintypes.HANDLE, ctypes.POINTER(PROCESS_MEMORY_COUNTERS), wintypes.DWORD]
+            psapi.GetProcessMemoryInfo.restype = wintypes.BOOL
+
+            try:
+                if psapi.GetProcessMemoryInfo(dup_handle, ctypes.byref(counters), counters.cb):
+                    peak_mem_mb = counters.PeakWorkingSetSize / (1024 * 1024)
+            finally:
+                import _winapi
+                _winapi.CloseHandle(dup_handle)
 
     end = time.perf_counter_ns()
     elapsed_ms = (end - start) / 1_000_000.0
@@ -148,10 +171,13 @@ def main() -> int:
         dest="outfile",
         default="Utils/output.txt",
         help="Expected output file path. Default: output.txt")
+    default_compiler = "g++" if os.name == "nt" else "g++-15"
+    
     parser.add_argument(
         "--compiler",
-        default="g++-15",
-        help="Compiler command. Default: g++-15")
+        default=default_compiler,
+        help=f"Compiler command. Default: {default_compiler}"
+    )
     parser.add_argument(
         "--cflags",
         default="-O2 -std=gnu++23 -DONLINE_JUDGE",
