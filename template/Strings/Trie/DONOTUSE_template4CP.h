@@ -20,16 +20,16 @@ struct Trie {
     Trie(int max_nodes = 200005) { tree.resize(max_nodes); clear(); }
 
     // [CORE] O(1) Instant Reset. Call inside "while(T--)" multi-test loops!
-    void clear() { ptr = 0; new_node(); }
+    void clear() { ptr = 0; newNode(); }
 
-    int new_node() { tree[ptr] = Node(); return ptr++; }
+    int newNode() { tree[ptr] = Node(); return ptr++; }
 
     // [CORE] Insert string in O(L). For XOR Trie, pass binary string of numbers.
     void insert(const string& s) {
         int u = 0; tree[0].pass++;
         for (char ch : s) {
             int c = ch - BASE;
-            if (tree[u].nxt[c] == -1) tree[u].nxt[c] = new_node();
+            if (tree[u].nxt[c] == -1) tree[u].nxt[c] = newNode();
             u = tree[u].nxt[c]; tree[u].pass++;
         }
         tree[u].end++;
