@@ -24,6 +24,8 @@ struct StringTrie {
 
     int newNode() { tree[ptr] = Node(); return ptr++; }
 
+    // You can use the bool version, but add a bool and initialize it to false and...
+    // change it to true if you create a newNode (a.k.a. bool = true inside the if statement)
     void insert(const string& s) {
         int u = 0; tree[0].pass++;
         for (char ch : s) {
