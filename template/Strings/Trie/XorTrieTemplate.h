@@ -39,9 +39,13 @@ struct XorTrie {
         }
     }
 
+    // If you want to erase the number you xor with...
+    // add tree[0].pass--; at the begining of the fucntion before int u and...
+    // add tree[u].pass--; at the end of the for loop
     // [CORE] Returns the maximum possible value of (x ^ y) for all y currently in Trie
     int get_max_xor(int x) {
         if (tree[0].pass == 0) return 0; // Empty Trie safety
+        // tree[0].pass--;
         int u = 0, max_xor = 0;
         for (int i = BITS - 1; i >= 0; i--) {
             int bit = (x >> i) & 1;
@@ -53,6 +57,7 @@ struct XorTrie {
             } else {
                 u = tree[u].nxt[bit];
             }
+            // tree[u].pass--;
         }
         return max_xor;
     }
