@@ -56,4 +56,21 @@ struct XorTrie {
         }
         return max_xor;
     }
+
+    // [OPTIONAL] Returns the minimum possible value of (x ^ y) for all y currently in Trie
+    int get_min_xor(int x) {
+        if (tree[0].pass == 0) return 0; // Empty Trie safety
+        int u = 0, min_xor = 0;
+        for (int i = BITS - 1; i >= 0; i--) {
+            int bit = (x >> i) & 1;
+            int want = bit; // Greedily want the opposite bit to maximize XOR
+            if (tree[u].nxt[want] != -1 && tree[tree[u].nxt[want]].pass > 0) {
+                u = tree[u].nxt[want];
+            } else {
+                min_xor |= (1 << i);
+                u = tree[u].nxt[1 - bit];
+            }
+        }
+        return min_xor;
+    }
 };
