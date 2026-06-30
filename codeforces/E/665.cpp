@@ -1,9 +1,25 @@
+/*
+       بسم الله الرحمن الرحيم
+    أسالك يا الله التوفيق والنجاح
+*/
 #include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
 using namespace std;
 
-// ============================================================================
-// BITWISE XOR TRIE TEMPLATE (Maximum XOR, Bitwise Pair Matching)
-// ============================================================================
+#define endl '\n'
+#define int long long
+
+const int MOD = 1e9 + 7;
+const long long INF = 1e18;
+
+static const int IO_SPEEDUP = [](){
+    ios::sync_with_stdio(false);
+    cout.tie(nullptr);
+    cin.tie(nullptr);
+    return 0;
+}();
+
 struct XorTrie {
     static const int BITS = 30; // [CORE] Use 30 for numbers <= 10^9, 62 for long long <= 10^18
 
@@ -16,7 +32,7 @@ struct XorTrie {
     vector<Node> tree;
     int ptr = 0;
 
-    XorTrie(int max_nodes = 200005) { tree.resize(max_nodes); clear(); }
+    XorTrie(int max_nodes = 12000005) { tree.resize(max_nodes); clear(); }
 
     void clear() { ptr = 0; newNode(); }
 
@@ -79,42 +95,55 @@ struct XorTrie {
         return min_xor;
     }
 
-    // [CORE] Returns count of y in Trie such that (x ^ y) >= k
     int count_greater_equal(int x, int k) {
-        if (tree[0].pass == 0) return 0; // Empty Trie safety
-        
+        if (tree[0].pass == 0) return 0;
         int u = 0, count = 0;
-        
-        for (int i = BITS - 1; i >= 0; i--) {
-            if (u == -1) break; // Dead end, no more paths to check
-            
+        for (int i = BITS - 1; i >= 0; --i) {
+            if (u == -1) break;
             int bit_x = (x >> i) & 1;
             int bit_k = (k >> i) & 1;
-            
+
             if (bit_k == 1) {
-                // The XOR MUST be 1 here to keep up with k.
-                // We have no choice but to go down the opposite bit path.
                 u = tree[u].nxt[1 - bit_x];
-            } else {
-                // bit_k is 0. 
-                // Path 1: If we get a 1, it's STRICTLY GREATER than k. 
-                // All elements in this subtree are valid! Add them all.
+            }
+            else {
                 if (tree[u].nxt[1 - bit_x] != -1) {
                     count += tree[tree[u].nxt[1 - bit_x]].pass;
                 }
-                
-                // Path 2: We get a 0, which matches k. 
-                // We must keep traversing down to check the lower bits.
                 u = tree[u].nxt[bit_x];
             }
         }
-        
-        // If we finish the loop and haven't fallen off the Trie,
-        // the remaining elements at this node have an XOR sum EXACTLY equal to k.
+
         if (u != -1) {
             count += tree[u].pass;
         }
-        
         return count;
     }
 };
+
+void solve() {
+    int n, k; cin >> n >> k;
+    vector<int> a(n);
+    for (auto &x : a) cin >> x;
+
+    vector<int> prefix(n);
+    prefix[0] = a[0];
+    for (int i = 1; i < n; ++i) prefix[i] = prefix[i - 1] ^ a[i];
+
+    XorTrie trie;
+    trie.insert(0);
+    int ans = 0;
+    for (int r = 0; r < n; ++r) {
+        ans += trie.count_greater_equal(prefix[r], k);
+        trie.insert(prefix[r]);
+    }
+
+    cout << ans << endl;
+}
+
+signed main() {
+    // print("Leeking"); // Yes, it works and yes, it's Python
+
+    solve();
+    return 0;
+}
