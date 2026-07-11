@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+# ! Run from you Competitive Programming Root Directory with `python Utils/countLines.py`
+
 def count_cpp_lines(directory):
     totalLines = 0
     filesCount = 0
