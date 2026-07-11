@@ -7,7 +7,7 @@ output.txt
 .vscode
 bin/
 .DS_Store
-DDebug.dSYM/
+*.dSYM/
 Temp/
 *.bin
 build/
