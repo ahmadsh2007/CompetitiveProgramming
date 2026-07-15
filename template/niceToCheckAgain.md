@@ -2,3 +2,4 @@
 [2206J](https://codeforces.com/contest/2206/problem/J)
 [242C](https://codeforces.com/contest/242/problem/C)
 [1398C](https://codeforces.com/problemset/problem/1398/C)
+[1941D](https://codeforces.com/contest/1941/problem/D)
