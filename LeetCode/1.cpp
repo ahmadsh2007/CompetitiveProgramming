@@ -31,7 +31,7 @@ int main() {
         int n; cin >> n;
         vector<int> num(n);
         for (auto &x : num) cin >> x;
-        int target; cin >> target
+        int target; cin >> target;
     
         auto ans = solver.twoSum(num, target);
         cout << "Result: [";
