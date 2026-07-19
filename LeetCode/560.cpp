@@ -42,7 +42,7 @@ int main() {
         for (auto &x : nums) cin >> x;
         int k; cin >> k;
     
-        auto ans = solver.subarraySum(nums);
+        auto ans = solver.subarraySum(nums, k);
         // cout << "Result: [";
         cout << ans << endl;
         // cout << "]\n";
