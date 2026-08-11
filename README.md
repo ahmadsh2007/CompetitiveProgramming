@@ -71,22 +71,9 @@ using namespace std;
 
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
-#define sz(x) (int)(x).size()
 #define endl '\n'
 #define int long long
 #define str string // What a Python
-
-#define vi   vector<int>
-#define vill vector<ll>
-#define read(v) for (auto &x : v) cin >> x;
-#define cin(v)  for (auto &x : v) cin >> x;
-#define cout(v) for (auto &x : v) cout << x << ' ';
-
-using ll  = long long;
-using ull = unsigned long long;
-
-using u128 = unsigned __int128;
-using i128 = __int128;
 
 const int MOD = 1e9 + 7;
 const long long INF = 1e18;
@@ -107,21 +94,11 @@ void solve() {
 
 const int TESTCASES = 1;
 int main() {
-    #ifndef ONLINE_JUDGE
-        // ! adjust depth if necessary
-        freopen("Utils/input.txt", "r", stdin);
-        freopen("Utils/output.txt", "w", stdout);
-    #endif
-
     // print("Leeking"); // Yes, it works and yes, it's Python
 
-    ull TTT = 1;
-    if (TESTCASES == 1) cin >> TTT;
-    else if (TESTCASES == 2) {
-    #ifndef ONLINE_JUDGE
-      cin >> TTT;
-    #endif
-    }
+    int TTT = 1;
+    if (TESTCASES) cin >> TTT;
+    while (TTT--) solve();
     return 0;
 }
 ```
