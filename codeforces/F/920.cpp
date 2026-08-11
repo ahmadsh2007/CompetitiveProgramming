@@ -87,7 +87,7 @@ private:
         updateMax(st, l, r, 2 * x + 1, lx, mid);
         updateMax(st, l, r, 2 * x + 2, mid, rx);
 
-        tree[x] = max(tree[2 * x + 1], tree[2 * x + 2]);
+        tree[x] = op(tree[2 * x + 1], tree[2 * x + 2]);
     }
 
     void update(int i, T v, int x, int lx, int rx) {

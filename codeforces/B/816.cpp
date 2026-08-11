@@ -80,14 +80,14 @@ std::mt19937_64 rng(std::chrono::steady_clock::now().time_since_epoch().count())
 int dx[] = {-1, 1, 0, 0};
 int dy[] = {0, 0, -1, 1};
 
-const int N = 200002;
-vector<int> a(N);
-vector<int> prefix(N);
+const int MAX = 200002;
+vector<int> a(MAX);
+vector<int> prefix(MAX);
 
 void solve() {
     int n, k, q; cin >> n >> k >> q;
 
-    for (int i = 0; i < N; ++i) a[i] = 0, prefix[i] = 0;
+    for (int i = 0; i < MAX; ++i) a[i] = 0, prefix[i] = 0;
 
     for (int i = 0; i < n; ++i) {
         int l, r; cin >> l >> r;
@@ -97,7 +97,7 @@ void solve() {
     }
 
     int cnt = 0;
-    for (int i = 1; i < N; ++i) {
+    for (int i = 1; i < MAX; ++i) {
         cnt += a[i];
         prefix[i] = prefix[i - 1] + (cnt >= k);
     }
