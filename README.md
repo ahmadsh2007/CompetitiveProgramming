@@ -94,6 +94,11 @@ void solve() {
 
 const int TESTCASES = 1;
 int main() {
+    // #ifndef ONLINE_JUDGE
+    //     // ! adjust depth if necessary
+    //     freopen("Utils/input.txt", "r", stdin);
+    //     freopen("Utils/output.txt", "w", stdout);
+    // #endif
     // print("Leeking"); // Yes, it works and yes, it's Python
 
     int TTT = 1;
