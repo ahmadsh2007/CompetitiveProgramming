@@ -41,7 +41,7 @@ struct SegTree {
     }
 
     int get(int l, int r, int x, int lx, int rx) {
-        if (lx >= r or l >= rx) return 1e9 + 7;
+        if (lx >= r or l >= rx) return LLONG_MAX;
         if (lx >= l and rx <= r) {
             return tree[x].mn;
         }
