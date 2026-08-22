@@ -193,18 +193,13 @@ void solve() {
         return new_tag;
     };
 
-    LazySegTree<Node, Node, decltype(op), decltype(mapping), decltype(comp)> lst(a, Node(), op, mapping, comp);
+    LazySegTree<Node, char, decltype(op), decltype(mapping), decltype(comp)> lst(a, Node(), op, mapping, comp);
 
     while (q--) {
         str op; cin >> op;
         if (op == "SET") {
             int l, r; char c; cin >> l >> r >> c;
-            Node temp;
-            temp.first = temp.last = c;
-            temp.alter = true;
-            temp.empty = false;
-            temp.mask = (1 << (c - 'a'));
-            lst.update(l - 1, r, temp);
+            lst.update(l - 1, r, c);
         }
         else {
             int l, r; cin >> l >> r;
