@@ -21,7 +21,7 @@ signed main() {
         double RG = sqrt(S);
         double EG = sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 
-        cout << (RG - EG) * (RG - EG) * .5 << endl;
+        cout << fixed << setprecision(7) << (RG - EG) * (RG - EG) * .5 << endl;
     }
 
     return 0;
