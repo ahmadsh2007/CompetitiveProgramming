@@ -1,30 +1,31 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include<bits/stdc++.h>
 using namespace std;
-#define int long long
-#define endl '\n'
-#define str string
+#define ll long long
 
-void solve() {
-    int l, r, x; cin >> l >> r >> x;
-    int ans = 0;
-    
-    for (int i = 0; i < 31; ++i) {
-        int cur = 0;
-        for (int j = i + 1; j < 31; ++j) {
-            cur |= (1 << j);
-            if (cur <= x) {
-                
-            }
-        }
+void ayham(int isco)
+{
+  ll n,l,r;cin>>n>>l>>r;
+  ll ans=0;
+  for(ll d=1;d<=r;d++)
+  {
+    ll lx=max(l,d);
+    ll rx=r;
+
+    if(rx>=lx)
+    {
+      ans+=((n-lx)/d)-((n-rx-1)/d);
     }
+  }
+  cout<<ans<<"\n";
 }
-
-signed main() {
-    ios::sync_with_stdio(false);
-    
-    int t; cin >> t;
-    while (t--) {
-        solve();
-    }
+int main() 
+{  
+  int t=1;
+  cin>>t;
+  while(t--)
+  {
+    ayham(22);
+  }
     return 0;
 }

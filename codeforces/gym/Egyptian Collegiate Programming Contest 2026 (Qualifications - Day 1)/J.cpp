@@ -55,14 +55,17 @@ void solve() {
             if (levels[l][i] == 1) continue;
             
             int remaining = a[levels[l][i]] % k;
+            if(remaining<0)
+            remaining+=k;
+           
             if (remaining < k - remaining) {
                 a[levels[l][i]] -= remaining;
                 a[parent[levels[l][i]].first] += remaining;
                 ans += parent[levels[l][i]].second * remaining;
             }
             else {
-                a[levels[l][i]] -= (k - remaining);
-                a[parent[levels[l][i]].first] += (k - remaining);
+                a[levels[l][i]] += (k - remaining);
+                a[parent[levels[l][i]].first] -= (k - remaining);
                 ans += parent[levels[l][i]].second * (k - remaining);
             }
         }
