@@ -1,6 +1,6 @@
 /*
        بسم الله الرحمن الرحيم
-    أسالك يا الله التوفيق والنجاح
+    أسالك يا الله التوفيق والنجاح
 */
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
@@ -87,34 +87,39 @@ struct Info {
 };
 
 void solve() {
-    // Wrong Solution
     int n; cin >> n;
     vi a(n + 1);
     vector<Info> ans;
-    for (int i = 1; i <= n; ++i) cin >> a[i];
+    
+    bool possible = true;
+    for (int i = 1; i <= n; ++i) {
+        cin >> a[i];
+        if (a[i] > i - 1) possible = false; 
+    }
 
-    auto moveCake = [&](const auto & self, int n, int from, int to, int aux) -> bool {
-        if (n == 0) return true;
+    if (!possible) return void(cout << "NO\n");
+    
+    auto moveCake = [&](const auto & self, int n, int from, int to, int aux) -> void {
+        if (n <= 0) return;
 
         if (a[n] == 0) {
-            if (!self(self, n - 1, from, aux, to)) return false;
+            self(self, n - 1, from, aux, to);
             ans.push_back({n, from, to});
-            if (!self(self, n - 1, aux, to, from)) return false;
+            self(self, n - 1, aux, to, from);
         } 
-        else if (a[n] == n - 1) {
+        else {
+            self(self, n - 1 - a[n], from, aux, to);
             ans.push_back({n, from, to});
-            if (!self(self, n - 1, from, to, aux)) return false;
-        } 
-        else return false;
-        return true;
+            self(self, n - 1 - a[n], aux, from, to);
+            self(self, n - 1, from, to, aux);
+        }
     };
 
-    if (moveCake(moveCake, n, 1, 3, 2)) {
-        cout << "YES\n";
-        cout << ans.size() << endl;
-        for (auto & m : ans) cout << m.id << " " << m.from << " " << m.to << endl;
-    }
-    else cout << "NO\n";
+    moveCake(moveCake, n, 1, 3, 2);
+    
+    cout << "YES\n";
+    cout << ans.size() << endl;
+    for (auto & m : ans) cout << m.id << " " << m.from << " " << m.to << endl;
 }
 
 const int TESTCASES = 1;

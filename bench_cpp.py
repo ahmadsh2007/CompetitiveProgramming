@@ -171,7 +171,7 @@ def main() -> int:
         dest="outfile",
         default="Utils/output.txt",
         help="Expected output file path. Default: output.txt")
-    default_compiler = "g++" if os.name == "nt" else "g++-15"
+    default_compiler = "g++" if os.name == "nt" else "g++-16"
     
     parser.add_argument(
         "--compiler",
