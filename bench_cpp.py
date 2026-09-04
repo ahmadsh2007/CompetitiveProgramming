@@ -18,6 +18,7 @@ import os
 import shlex
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -40,110 +41,120 @@ def normalize_output(s: str, ignore_trailing_ws: bool) -> str:
 def run_program(exe_path: Path, input_text: str, timeout: float | None) -> tuple[float, str, str, int, float]:
     cmd = [str(exe_path)]
     time_tool = None
+    time_report_path: str | None = None
 
+    # The timing tool's own report is written to a private temp file (via -o)
+    # instead of sharing stderr with the program, so stderr stays exactly and
+    # only what the program itself wrote to cerr (no filtering/guessing needed).
     if sys.platform == "linux" and os.path.exists("/usr/bin/time"):
-        cmd = ["/usr/bin/time", "-f", "%M", str(exe_path)]
+        fd, time_report_path = tempfile.mkstemp(prefix="bench_cpp_time_")
+        os.close(fd)
+        cmd = ["/usr/bin/time", "-f", "%M", "-o", time_report_path, str(exe_path)]
         time_tool = "linux"
     elif sys.platform == "darwin" and os.path.exists("/usr/bin/time"):
-        cmd = ["/usr/bin/time", "-l", str(exe_path)]
+        fd, time_report_path = tempfile.mkstemp(prefix="bench_cpp_time_")
+        os.close(fd)
+        cmd = ["/usr/bin/time", "-l", "-o", time_report_path, str(exe_path)]
         time_tool = "mac"
 
     start = time.perf_counter_ns()
-    
-    with subprocess.Popen(
-        cmd,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        encoding="utf-8",
-    ) as p:
-        
-        dup_handle = None
-        if sys.platform == "win32":
-            import _winapi
-            dup_handle = _winapi.DuplicateHandle(
-                _winapi.GetCurrentProcess(),
-                p._handle,
-                _winapi.GetCurrentProcess(),
-                0,
-                False,
-                _winapi.DUPLICATE_SAME_ACCESS
-            )
 
-        try:
-            stdout, stderr = p.communicate(input=input_text, timeout=timeout)
-        except subprocess.TimeoutExpired:
-            p.kill()
-            stdout, stderr = p.communicate()
-            if dup_handle is not None:
+    try:
+        with subprocess.Popen(
+            cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            encoding="utf-8",
+        ) as p:
+
+            dup_handle = None
+            if sys.platform == "win32":
                 import _winapi
-                _winapi.CloseHandle(dup_handle)
-            raise subprocess.TimeoutExpired(p.args, timeout, output=stdout, stderr=stderr)
-        
-        peak_mem_mb = 0.0
-        
-        if sys.platform == "win32" and dup_handle is not None:
-            import ctypes
-            from ctypes import wintypes
-            class PROCESS_MEMORY_COUNTERS(ctypes.Structure):
-                _fields_ = [
-                    ("cb", wintypes.DWORD),
-                    ("PageFaultCount", wintypes.DWORD),
-                    ("PeakWorkingSetSize", ctypes.c_size_t),
-                    ("WorkingSetSize", ctypes.c_size_t),
-                    ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
-                    ("QuotaPagedPoolUsage", ctypes.c_size_t),
-                    ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
-                    ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-                    ("PagefileUsage", ctypes.c_size_t),
-                    ("PeakPagefileUsage", ctypes.c_size_t),
-                ]
-            counters = PROCESS_MEMORY_COUNTERS()
-            counters.cb = ctypes.sizeof(counters)
-            psapi = ctypes.WinDLL('psapi')
-            
-            psapi.GetProcessMemoryInfo.argtypes = [wintypes.HANDLE, ctypes.POINTER(PROCESS_MEMORY_COUNTERS), wintypes.DWORD]
-            psapi.GetProcessMemoryInfo.restype = wintypes.BOOL
+                dup_handle = _winapi.DuplicateHandle(
+                    _winapi.GetCurrentProcess(),
+                    p._handle,
+                    _winapi.GetCurrentProcess(),
+                    0,
+                    False,
+                    _winapi.DUPLICATE_SAME_ACCESS
+                )
 
             try:
-                if psapi.GetProcessMemoryInfo(dup_handle, ctypes.byref(counters), counters.cb):
-                    peak_mem_mb = counters.PeakWorkingSetSize / (1024 * 1024)
-            finally:
-                import _winapi
-                _winapi.CloseHandle(dup_handle)
+                stdout, stderr = p.communicate(input=input_text, timeout=timeout)
+            except subprocess.TimeoutExpired:
+                p.kill()
+                stdout, stderr = p.communicate()
+                if dup_handle is not None:
+                    import _winapi
+                    _winapi.CloseHandle(dup_handle)
+                raise subprocess.TimeoutExpired(p.args, timeout, output=stdout, stderr=stderr)
 
-    end = time.perf_counter_ns()
-    elapsed_ms = (end - start) / 1_000_000.0
+            peak_mem_mb = 0.0
 
-    # Parse stderr for Unix based timing tools where the overhead prints alongside standard output
-    if time_tool == "linux":
-        lines = stderr.strip('\r\n').split('\n')
-        if lines:
+            if sys.platform == "win32" and dup_handle is not None:
+                    import ctypes
+                    from ctypes import wintypes
+                    class PROCESS_MEMORY_COUNTERS(ctypes.Structure):
+                        _fields_ = [
+                            ("cb", wintypes.DWORD),
+                            ("PageFaultCount", wintypes.DWORD),
+                            ("PeakWorkingSetSize", ctypes.c_size_t),
+                            ("WorkingSetSize", ctypes.c_size_t),
+                            ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+                            ("QuotaPagedPoolUsage", ctypes.c_size_t),
+                            ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+                            ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+                            ("PagefileUsage", ctypes.c_size_t),
+                            ("PeakPagefileUsage", ctypes.c_size_t),
+                        ]
+                    counters = PROCESS_MEMORY_COUNTERS()
+                    counters.cb = ctypes.sizeof(counters)
+                    psapi = ctypes.WinDLL('psapi')
+
+                    psapi.GetProcessMemoryInfo.argtypes = [wintypes.HANDLE, ctypes.POINTER(PROCESS_MEMORY_COUNTERS), wintypes.DWORD]
+                    psapi.GetProcessMemoryInfo.restype = wintypes.BOOL
+
+                    try:
+                        if psapi.GetProcessMemoryInfo(dup_handle, ctypes.byref(counters), counters.cb):
+                            peak_mem_mb = counters.PeakWorkingSetSize / (1024 * 1024)
+                    finally:
+                        import _winapi
+                        _winapi.CloseHandle(dup_handle)
+
+        end = time.perf_counter_ns()
+        elapsed_ms = (end - start) / 1_000_000.0
+
+        # Peak memory comes from the timing tool's report file, not stderr,
+        # so `stderr` above is untouched program cerr output.
+        if time_report_path is not None:
+            report_text = Path(time_report_path).read_text(encoding="utf-8", errors="replace")
+            if time_tool == "linux":
+                lines = [ln for ln in report_text.strip().splitlines() if ln.strip()]
+                if lines:
+                    try:
+                        # /usr/bin/time -f "%M" reports Peak RSS in KB
+                        peak_mem_mb = float(lines[-1].strip()) / 1024.0
+                    except ValueError:
+                        pass
+            elif time_tool == "mac":
+                for line in report_text.splitlines():
+                    if 'maximum resident set size' in line:
+                        try:
+                            # mac reports in bytes
+                            peak_mem_mb = float(line.split()[0]) / (1024 * 1024)
+                        except ValueError:
+                            pass
+                        break
+
+        return elapsed_ms, stdout, stderr, p.returncode, peak_mem_mb
+    finally:
+        if time_report_path is not None:
             try:
-                # /usr/bin/time -f "%M" outputs Peak RSS in KB
-                peak_mem_mb = float(lines[-1].strip()) / 1024.0
-                stderr = '\n'.join(lines[:-1])
-                if stderr: stderr += '\n'
-            except ValueError:
+                os.unlink(time_report_path)
+            except OSError:
                 pass
-    elif time_tool == "mac":
-        lines = stderr.split('\n')
-        clean_stderr = []
-        for line in lines:
-            if 'maximum resident set size' in line:
-                try:
-                    # mac outputs in bytes
-                    peak_mem_mb = float(line.split()[0]) / (1024 * 1024)
-                except ValueError:
-                    pass
-            elif line.strip().endswith('real') or line.strip().endswith('user') or line.strip().endswith('sys') or "maximum resident set size" in line:
-                continue
-            else:
-                clean_stderr.append(line)
-        stderr = '\n'.join(clean_stderr)
-
-    return elapsed_ms, stdout, stderr, p.returncode, peak_mem_mb
 
 def main() -> int:
     parser = argparse.ArgumentParser(
@@ -216,6 +227,11 @@ def main() -> int:
         "--keep-going",
         action="store_true",
         help="If output mismatch occurs, keep timing runs anyway (still reports mismatch)"
+        )
+    parser.add_argument(
+        "--hide-cerr",
+        action="store_true",
+        help="Don't print the program's cerr/stderr output after each run (shown by default)"
         )
     args = parser.parse_args()
 
@@ -311,6 +327,8 @@ def main() -> int:
                 print(expected[:400])
                 print("\n--- Got (first 400 chars) ---")
                 print(got[:400])
+                if not args.hide_cerr and stderr.strip():
+                    print(f"\n{YELLOW}--- cerr (error stream) ---{RESET}\n{stderr.rstrip()}")
 
             if not args.keep_going:
                 print(f"\n{RED}{BOLD}Stopping due to mismatch.{RESET} (Use {YELLOW}--keep-going{RESET} to continue timing anyway.)", file=sys.stderr)
