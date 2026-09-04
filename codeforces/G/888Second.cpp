@@ -20,7 +20,6 @@ ostream& operator<<(ostream& out, vector<T>& v){
 }
 
 #define endl '\n'
-#define int long long
 #define str string // What a Python
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
@@ -51,7 +50,7 @@ struct XorTrie {
     vector<Node> tree;
     int ptr = 0;
 
-    XorTrie(int max_nodes = 6000005) { tree.resize(max_nodes); clear(); }
+    XorTrie(int max_nodes = 3200005) { tree.resize(max_nodes); clear(); }
 
     void clear() { ptr = 0; newNode(); }
 
@@ -84,16 +83,16 @@ struct XorTrie {
         return res;
     }
 
-    int solve_mst(int u, int bit, const vector<int>& a) {
+    long long solve_mst(int u, int bit, const vector<int>& a) {
         if (bit < 0 or u == -1) return 0;
 
         int left = tree[u].nxt[0];
         int right = tree[u].nxt[1];
 
         if (left != -1 and right != -1) {
-            int minBridge = INF;
+            long long minBridge = INT_MAX;
             for (int i = tree[left].l; i <= tree[left].r; ++i) {
-                minBridge = min(minBridge, (1LL << bit) | query_min_xor(right, a[i], bit - 1));
+                minBridge = min(minBridge, (1ll << bit) | query_min_xor(right, a[i], bit - 1));
             }
             return minBridge + solve_mst(left, bit - 1, a) + solve_mst(right, bit - 1, a);
         }
@@ -118,7 +117,7 @@ void solve() {
         xt.insert(a[i], i);
     }
 
-    int ans = xt.solve_mst(0, XorTrie::BITS - 1, a);
+    long long ans = xt.solve_mst(0, XorTrie::BITS - 1, a);
     cout << ans << endl;
 }
 

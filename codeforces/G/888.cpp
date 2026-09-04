@@ -20,7 +20,6 @@ ostream& operator<<(ostream& out, vector<T>& v){
 }
 
 #define endl '\n'
-#define int long long
 #define str string // What a Python
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
@@ -48,7 +47,7 @@ struct XorTrie {
     vector<Node> tree;
     int ptr = 0;
 
-    XorTrie(int max_nodes = 4000005) { tree.resize(max_nodes); clear(); }
+    XorTrie(int max_nodes = 3200005) { tree.resize(max_nodes); clear(); }
 
     void clear() { ptr = 0; newNode(); }
 
@@ -133,7 +132,7 @@ XorTrieHelper getMinXorPair(const XorTrie & t1, int u1,
     return best;
 }
 
-int ans = 0;
+long long ans = 0;
 void moveMinEle(XorTrie& t1, XorTrie& t2) {
     XorTrieHelper temp = getMinXorPair(t1, 0, t2, 0);
     
