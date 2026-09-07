@@ -44,9 +44,9 @@ void solve() {
         b[i] = a[i] - i * k;
     }
     vector<int> prefix(n);
-    prefix[0] = a[0];
+    prefix[0] = b[0];
     for (int i = 1; i < n; ++i) {
-        prefix[i] = prefix[i - 1] + a[i];
+        prefix[i] = prefix[i - 1] + b[i];
     }
 
     vector<int> ans(n);
@@ -54,15 +54,16 @@ void solve() {
         int l = i + 1;
         int r = n - 1;
         int mid;
+        int target = b[i - 1] - k;
         while (l <= r) {
             mid = l + (r - l) / 2;
-            if (b[mid] <= (a[i - 1] - i * k)) {
+            if (b[mid] <= target) {
                 r = mid - 1;
             }
             else l = mid + 1;
         }
         int needed = l - i - 1;
-        ans[i] = (prefix[needed + i] - prefix[i]) - (k * (needed * (needed + 1)) / 2) - a[i - 1] * needed;
+        ans[i] = (prefix[l - 1] - prefix[i]) - needed * target;
     }
     cout << ans << endl;
 }
