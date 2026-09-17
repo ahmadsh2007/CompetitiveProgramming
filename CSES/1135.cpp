@@ -11,6 +11,7 @@ void dfs(int u) {
     for (auto &v : adj[u]) {
         if (!vis[v]) {
             depth[v] = depth[u] + 1;
+            lca[v][0] = u;
             for (int i = 1; i < LOG; ++i) {
                 lca[v][i] = lca[lca[v][i - 1]][i - 1];
             }
@@ -19,6 +20,8 @@ void dfs(int u) {
     }
 }
 int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
     cin >> n >> q;
     depth.assign(n + 1, 0);
     lca.assign(n + 1, vector<int>(LOG + 1));
@@ -40,11 +43,16 @@ int main() {
                 b = lca[b][i];
             }
         }
-        for (int i = LOG - 1; i >= 0; --i) {
-            if (a == b) break;
-            a = lca[a][i];
-            b = lca[b][i];
+        if (a == b) {
+            cout << depth[aRoot] + depth[bRoot] - 2 * depth[a] << '\n';
+            continue;
         }
-        cout << depth[aRoot] + depth[bRoot] - 2 * depth[a] << endl;
+        for (int i = LOG - 1; i >= 0; --i) {
+            if (lca[a][i] != lca[b][i]) {
+                a = lca[a][i];
+                b = lca[b][i];
+            }
+        }
+        cout << depth[aRoot] + depth[bRoot] - 2 * depth[lca[a][0]] << '\n';
     }
 }
