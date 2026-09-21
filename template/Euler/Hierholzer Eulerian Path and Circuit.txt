@@ -1,0 +1,91 @@
+// Finds an Eulerian trail/circuit visiting every edge exactly once in O(V + E).
+// Handles both directed and undirected graphs with pointer optimization.
+
+struct EulerianGraph {
+    struct Edge { int to, id; };
+
+    int n;
+    bool directed;
+    int edge_count = 0;
+    vector<vector<Edge>> adj;
+    vector<int> in_deg, out_deg;
+    vector<size_t> head;
+    vector<bool> used_edge;
+
+    EulerianGraph(int n, bool directed = false)
+        : n(n), directed(directed), adj(n + 1), in_deg(n + 1, 0), out_deg(n + 1, 0) {}
+
+    void add_edge(int u, int v) {
+        adj[u].push_back({v, edge_count});
+        out_deg[u]++;
+        in_deg[v]++;
+        if (!directed) {
+            adj[v].push_back({u, edge_count});
+            out_deg[v]++;
+            in_deg[u]++;
+        }
+        edge_count++;
+    }
+
+    vector<int> get_trail(int start_node = -1) {
+        used_edge.assign(edge_count, false);
+        head.assign(n + 1, 0);
+
+        int start = -1, odd_deg = 0;
+        int out_minus_in = 0, in_minus_out = 0;
+
+        for (int i = 1; i <= n; ++i) {
+            if (directed) {
+                if (out_deg[i] - in_deg[i] == 1) {
+                    out_minus_in++;
+                    start = i;
+                } else if (in_deg[i] - out_deg[i] == 1) {
+                    in_minus_out++;
+                } else if (in_deg[i] != out_deg[i]) {
+                    return {};
+                }
+            } else {
+                if ((in_deg[i] + out_deg[i]) / 2 % 2 != 0) {
+                    odd_deg++;
+                    start = i;
+                }
+            }
+        }
+
+        if (directed) {
+            if (!((out_minus_in == 0 && in_minus_out == 0) || (out_minus_in == 1 && in_minus_out == 1)))
+                return {};
+        } else {
+            if (odd_deg != 0 && odd_deg != 2) return {};
+        }
+
+        if (start_node != -1) start = start_node;
+        if (start == -1) {
+            for (int i = 1; i <= n; ++i) {
+                if (!adj[i].empty()) { start = i; break; }
+            }
+        }
+        if (start == -1) return {1};
+
+        vector<int> path, st = {start};
+        while (!st.empty()) {
+            int u = st.back();
+            while (head[u] < adj[u].size() && used_edge[adj[u][head[u]].id]) {
+                head[u]++;
+            }
+            if (head[u] < adj[u].size()) {
+                auto [v, id] = adj[u][head[u]];
+                used_edge[id] = true;
+                head[u]++;
+                st.push_back(v);
+            } else {
+                path.push_back(u);
+                st.pop_back();
+            }
+        }
+
+        if ((int)path.size() != edge_count + 1) return {};
+        reverse(path.begin(), path.end());
+        return path;
+    }
+};

@@ -1,0 +1,73 @@
+// Evaluates: a[0] ^ a[1] ^ a[2] ^ ... mod m
+// Extended Euler Theorem:
+// a^b = a^(b)                  if b < phi(m)
+// a^b = a^(b mod phi(m) + phi(m)) if b >= phi(m)
+
+long long get_phi(long long n) {
+    long long res = n;
+    for (long long p = 2; p * p <= n; ++p) {
+        if (n % p == 0) {
+            while (n % p == 0) n /= p;
+            res -= res / p;
+        }
+    }
+    if (n > 1) res -= res / n;
+    return res;
+}
+
+// Computes (base^exp), returns {val % mod, is_ge_mod}
+pair<long long, bool> safe_mod_pow(long long base, long long exp, long long mod) {
+    long long res = 1 % mod;
+    bool saturated = (1 >= mod);
+    long long cur = base;
+
+    while (exp > 0) {
+        if (exp & 1) {
+            long long nxt = res * cur;
+            if (nxt >= mod || saturated) saturated = true;
+            res = nxt % mod;
+        }
+        if (exp > 1) {
+            long long nxt_cur = cur * cur;
+            if (nxt_cur >= mod) saturated = true;
+            cur = nxt_cur % mod;
+        }
+        exp >>= 1;
+    }
+    return {res, saturated};
+}
+
+// Evaluates a[idx...end] modulo m
+long long power_tower(const vector<long long>& a, size_t idx, long long m) {
+    if (idx == a.size() || m == 1) return 0;
+    if (idx == a.size() - 1) return a[idx] % m;
+
+    long long phi_m = get_phi(m);
+    long long exp = power_tower(a, idx + 1, phi_m);
+
+    // Check if the actual tower above idx is >= phi_m
+    long long actual_tail = a[idx + 1];
+    bool is_ge = (actual_tail >= phi_m);
+    for (size_t i = idx + 2; i < a.size() && !is_ge; ++i) {
+        if (a[i] == 0) { actual_tail = 1; break; }
+        if (a[i] == 1) break;
+        if (actual_tail >= 60) { is_ge = true; break; }
+        long long cur = 1;
+        for (int step = 0; step < a[i]; ++step) {
+            cur *= actual_tail;
+            if (cur >= phi_m) { is_ge = true; break; }
+        }
+        actual_tail = cur;
+    }
+
+    if (is_ge) exp += phi_m;
+
+    // a[idx]^exp % m
+    long long res = 1, base = a[idx] % m;
+    while (exp > 0) {
+        if (exp & 1) res = (__int128)res * base % m;
+        base = (__int128)base * base % m;
+        exp >>= 1;
+    }
+    return res;
+}
