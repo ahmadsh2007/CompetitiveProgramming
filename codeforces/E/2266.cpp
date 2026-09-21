@@ -45,14 +45,14 @@ vector<int> dp(2e5 + 10, -1);
 vector<int> vis(2e5 + 10, 0);
 int timer = 0;
 int n, k;
-int check(int x, vector<int> & dp) {
+int check(int x) {
     if (x <= k) return 0ll;
     if (vis[x] == timer) return dp[x];
     int xx = x;
     int ans = LLONG_MAX;
     while (xx != 1) {
         int p = spf[xx];
-        ans = min(ans, 1 + p * check(x / p, dp));
+        ans = min(ans, 1 + p * check(x / p));
         while (xx % p == 0) xx /= p;
     }
     vis[x] = timer;
@@ -66,7 +66,7 @@ void solve() {
     timer++;
     int ans = 0;
     for (int i = 0; i < n; ++i) {
-        ans += check(a[i], dp);
+        ans += check(a[i]);
     }
 
     cout << ans << endl;
