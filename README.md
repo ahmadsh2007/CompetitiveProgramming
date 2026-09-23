@@ -24,19 +24,27 @@ CompetitiveProgramming/
 ├─ CSES/
 ├─ local contests/
 │  └─ <ContestName>/
+├─ Others/
+│  ├─ AtCoder/
+│  ├─ HackerRank/
+│  ├─ SphereOnlineJudge/
+│  └─ vjudge/
 ├─ template/
-│  └─ <TrainingEntity>/
 ├─ training/
 │  ├─ JUST ACM/
 │  └─ Mansoura's problem solving roadmap/
 ├─ Utils/
+│  ├─ CheatSheet.pdf
+│  ├─ codeShortcuts4Mac.pdf
+│  ├─ codeShortcuts4Win.pdf
+│  ├─ countLines.py
+│  ├─ CP_Reference_Combined.pdf
 │  ├─ debug.h
+│  ├─ dp.py
+│  ├─ helper.py
 │  ├─ input.txt
 │  └─ output.txt
-├─ vjudge/
-├─ helper.py
-├─ CP_Notebook.md
-├─ CheatSheet.pdf
+├─ .cp_counter
 ├─ bench_cpp.py
 ├─ cp_commit.py
 ├─ LICENSE
