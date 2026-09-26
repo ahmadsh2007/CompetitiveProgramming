@@ -35,13 +35,13 @@ static const int IO_SPEEDUP = [](){
     return 0;
 }();
 
-const int LOG = 30;
+const int LOG = 19;
 
 void solve() {
     int n, m; cin >> n >> m;
     vector<vector<pair<int, int>>> adj(n + 1);
-    vector<vector<int>> lca(n + 1, vector<int>(LOG, 0));
-    vector<vector<int>> mns(n + 1, vector<int>(LOG, LLONG_MAX));
+    vector<vector<int>> lca(LOG, vector<int>(n + 1, 0));
+    vector<vector<int>> mns(LOG, vector<int>(n + 1, LLONG_MAX));
     vector<int> depth(n + 1);
     for (int i = 1; i < n; ++i) {
         int u, v, w; cin >> u >> v >> w;
@@ -53,11 +53,11 @@ void solve() {
         for (auto &[v, w] : adj[u]) {
             if (v != p) {
                 depth[v] = depth[u] + 1;
-                lca[v][0] = u;
-                mns[v][0] = w;
+                lca[0][v] = u;
+                mns[0][v] = w;
                 for (int i = 1; i < LOG; ++i) {
-                    lca[v][i] = lca[lca[v][i - 1]][i - 1];
-                    mns[v][i] = min(mns[v][i - 1], mns[lca[v][i - 1]][i - 1]);
+                    lca[i][v] = lca[i - 1][lca[i - 1][v]];
+                    mns[i][v] = min(mns[i - 1][v], mns[i - 1][lca[i - 1][v]]);
                 }
                 dfs(dfs, v, u);
             }
@@ -74,8 +74,8 @@ void solve() {
         int diff = depth[a] - depth[b];
         for (int i = 0; i < LOG; ++i) {
             if (diff & (1 << i)) {
-                ans = min(ans, mns[a][i]);
-                a = lca[a][i];
+                ans = min(ans, mns[i][a]);
+                a = lca[i][a];
             }
         }
 
@@ -84,13 +84,13 @@ void solve() {
         }
         else {
             for (int i = LOG - 1; i >= 0; --i) {
-                if (lca[a][i] != lca[b][i]) {
-                    ans = min({ans, mns[a][i], mns[b][i]});
-                    a = lca[a][i];
-                    b = lca[b][i];
+                if (lca[i][a] != lca[i][b]) {
+                    ans = min({ans, mns[i][a], mns[i][b]});
+                    a = lca[i][a];
+                    b = lca[i][b];
                 }
             }
-            ans = min(ans, mns[a][0]);
+            ans = min({ans, mns[0][a], mns[0][a]});
             cout << ans << endl;
         }
     }

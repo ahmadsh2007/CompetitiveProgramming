@@ -35,12 +35,12 @@ static const int IO_SPEEDUP = [](){
     return 0;
 }();
 
-const int LOG = 30;
+const int LOG = 19;
 
 void solve() {
     int n; cin >> n;
     vector<vector<int>> adj(n + 1);
-    vector<vector<int>> lca(n + 1, vector<int>(LOG, 0));
+    vector<vector<int>> lca(LOG, vector<int>(n + 1, 0));
     vector<int> depth(n + 1);
     for (int i = 1; i < n; ++i) {
         int u, v; cin >> u >> v;
@@ -52,9 +52,9 @@ void solve() {
         for (auto &v : adj[u]) {
             if (v != p) {
                 depth[v] = depth[u] + 1;
-                lca[v][0] = u;
+                lca[0][v] = u;
                 for (int i = 1; i < LOG; ++i) {
-                    lca[v][i] = lca[lca[v][i - 1]][i - 1];
+                    lca[i][v] = lca[i - 1][lca[i - 1][v]];
                 }
                 dfs(dfs, v, u);
             }
@@ -72,19 +72,19 @@ void solve() {
         int diff = depth[a] - depth[b];
         for (int i = 0; i < LOG; ++i) {
             if (diff & (1 << i)) {
-                a = lca[a][i];
+                a = lca[i][a];
             }
         }
 
         int root = a;
         if (a != b) {
             for (int i = LOG - 1; i >= 0; --i) {
-                if (lca[a][i] != lca[b][i]) {
-                    a = lca[a][i];
-                    b = lca[b][i];
+                if (lca[i][a] != lca[i][b]) {
+                    a = lca[i][a];
+                    b = lca[i][b];
                 }
             }
-            root = lca[a][0];
+            root = lca[0][a];
         }
 
         int d1 = depth[aa] - depth[root];
@@ -97,7 +97,7 @@ void solve() {
         else if (d1 >= c) {
             for (int i = 0; i < LOG; ++i) {
                 if (c & (1 << i)) {
-                    aa = lca[aa][i];
+                    aa = lca[i][aa];
                 }
             }
             cout << aa << endl;
@@ -106,7 +106,7 @@ void solve() {
             c = d - c;
             for (int i = 0; i < LOG; ++i) {
                 if (c & (1 << i)) {
-                    bb = lca[bb][i];
+                    bb = lca[i][bb];
                 }
             }
             cout << bb << endl;
