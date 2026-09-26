@@ -90,7 +90,7 @@ void solve() {
                     b = lca[i][b];
                 }
             }
-            ans = min({ans, mns[0][a], mns[0][a]});
+            ans = min({ans, mns[0][a], mns[0][b]});
             cout << ans << endl;
         }
     }
