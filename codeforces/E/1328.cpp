@@ -47,7 +47,7 @@ void solve() {
         adj[v].push_back(u);
     }
 
-    auto dfs = [&](auto dfs, int u, int p) -> void {
+    auto dfs = [&](this auto&& self, int u, int p) -> void {
         for (auto &v : adj[u]) {
             if (v != p) {
                 depth[v] = depth[u] + 1;
@@ -55,12 +55,12 @@ void solve() {
                 for (int i = 1; i < LOG; ++i) {
                     lca[i][v] = lca[i - 1][lca[i - 1][v]];
                 }
-                dfs(dfs, v, u);
+                self(v, u);
             }
         }
     };
 
-    dfs(dfs, 1, 0);
+    dfs(1, 0);
 
     auto getLCA = [&](int a, int b) -> int {
         int diff = depth[a] - depth[b];
@@ -92,7 +92,7 @@ void solve() {
         for (int i = 0; i < k - 1; ++i) {
             int a = v[i], b = v[i + 1];
             int lca = getLCA(a, b);
-            if (lca != a and lca != b and depth[a] - depth[lca] > 1 and depth[b] - depth[lca] > 1) {
+            if (depth[a] - depth[lca] > 1 and depth[b] - depth[lca] > 1) {
                 ans = false;
                 break;
             }
