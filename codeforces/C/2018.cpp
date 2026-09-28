@@ -67,7 +67,10 @@ void solve() {
     dfs(1, 0);
 
     vector<int> set(n);
-    for (int i = 0; i < n; ++i) set[i] = i + 1;
+    for (int i = 0; i < n; ++i) {
+        set[i] = i + 1;
+    }
+
     sort(all(set), [](int a, int b) {
         return mx[a] < mx[b];
     });
@@ -81,6 +84,7 @@ void solve() {
     for (int i = 1; i <= n + 1; ++i) {
         prefix[i] += prefix[i - 1];
     }
+
     for (int d = 0; d <= mx[1]; ++d) {
         while (cur < n and mx[set[cur]] < d) {
             cur++;
@@ -88,6 +92,7 @@ void solve() {
         int kept = prefix[d + 1] - cur;
         ans = min(ans, n - kept);
     }
+    
     cout << ans << endl;
 }
 
