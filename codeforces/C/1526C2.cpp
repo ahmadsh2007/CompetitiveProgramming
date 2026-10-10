@@ -50,19 +50,15 @@ void solve() {
             ans++;
             cur += a[i];
         }
-        else {
-            if (cur >= -a[i]) {
-                st.push(a[i]);
-                cur += a[i];
-                ans++;
-            }
-            else {
-                if (!st.empty() and a[i] > st.top()) {
-                    cur += a[i] - st.top();
-                    st.pop();
-                    st.push(a[i]);
-                }
-            }
+        else if (cur >= -a[i]) {
+            st.push(a[i]);
+            cur += a[i];
+            ans++;
+        }
+        else if (!st.empty() and a[i] > st.top()) {
+            cur += a[i] - st.top();
+            st.pop();
+            st.push(a[i]);
         }
     }
 
