@@ -52,7 +52,7 @@ void solve() {
     cout << ans << endl;
 }
 
-const int TESTCASES = 1;
+const int TESTCASES = 0;
 signed main() {
     // print("Leeking"); // Yes, it works and yes, it's Python
 
