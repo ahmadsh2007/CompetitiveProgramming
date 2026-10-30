@@ -6,9 +6,6 @@
 using namespace std;
 
 #define endl '\n'
-#define int long long
-#define all(x) (x).begin(), (x).end()
-#define rall(x) (x).rbegin(), (x).rend()
 
 static const int IO_SPEEDUP = [](){
     ios::sync_with_stdio(false);
