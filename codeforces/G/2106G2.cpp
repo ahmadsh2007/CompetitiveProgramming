@@ -82,26 +82,20 @@ void solve() {
     while (root == -1) {
         int c = getCentroid(start);
  
-        vector<int> nb;
-        for (int v : adj[c]) {
-            if (alive[v]) nb.push_back(v);
-        }
-        int d = nb.size();
- 
-        int l = 0, r = d;
+        int l = 0, r = (int) adj[c].size();
         while (l < r) {
             int mid = (l + r) / 2;
-            vector<int> set(nb.begin() + l, nb.begin() + mid + 1);
+            vector<int> set(adj[c].begin() + l, adj[c].begin() + mid + 1);
             if (parentIn(c, set)) r = mid;
             else l = mid + 1;
         }
  
-        if (l == d) {
+        if (l == (int) adj[c].size()) {
             root = c;
             break;
         }
  
-        int p = nb[l];
+        int p = adj[c][l];
         alive[c] = 0;
         vector<char> keep(n + 1, 0);
         vector<int> st = {p};
