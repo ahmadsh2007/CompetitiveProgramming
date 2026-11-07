@@ -49,13 +49,15 @@ void second() {
 
     vector<int> colors(n + 1, -1);
 
-    colors[0] = 1;
     bool hasOne = true;
     auto dfs = [&](this auto&& self, int u, int p, int color) -> void {
-        if (color == colors[p]) {
-            hasOne = false;
+        if (~colors[u]) {
+            if (colors[u] != color) {
+                hasOne = false;
+                return;
+            }
         }
-        colors[u] = colors[p] ^ 1;
+        colors[u] = color;
         for (auto &v : adj[u]) {
             if (v != p) {
                 self(v, u, color ^ 1);
