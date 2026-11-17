@@ -108,7 +108,7 @@ signed main() {
 
     int ans = 0;
     for (int i = 0; i < n; ++i) {
-        int r = lower_bound(vals.begin(), vals.end(), x[i]) - vals.begin();
+        int r = lower_bound(vals.begin(), vals.begin() + m, x[i]) - vals.begin();
         int cur = (1 + st.query(0, r)) % MOD;
         st.add(r, cur);
         ans = (ans + cur) % MOD;
