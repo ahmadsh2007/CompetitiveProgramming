@@ -124,6 +124,8 @@ void solve() {
 
     int ans = 0;
     for (int i = 1; i <= n; ++i) {
+        // L <= pre[i] - target <= R
+        // pre[i] - R <= target <= pre[i] - L
         int l = lower_bound(all(sorted), pre[i] - R) - sorted.begin();
         int r = upper_bound(all(sorted), pre[i] - L) - sorted.begin();
 
